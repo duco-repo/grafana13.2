@@ -48,7 +48,7 @@ jobs:
       changed-files: ${{ steps.changed-files.outputs.all_changed_files }}
       main-sha: ${{ steps.get-main-sha.outputs.sha }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
         with:
           persist-credentials: true
           fetch-depth: 0
@@ -178,7 +178,7 @@ jobs:
         codeowner: ${{ fromJSON(needs.setup.outputs.opted-in-teams) }}
     steps:
       - name: Checkout PR branch
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           path: './pr'
           persist-credentials: false
@@ -221,7 +221,7 @@ jobs:
 
       - name: Checkout main branch
         if: steps.check-affected.outputs.affected == 'true'
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
         with:
           ref: ${{ needs.detect-changes.outputs.main-sha }}
           path: './main'
