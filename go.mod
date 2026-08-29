@@ -154,7 +154,7 @@ require (
 	github.com/openfga/language/pkg/go v0.2.1 // @grafana/identity-access-team
 	github.com/openfga/openfga v1.18.1 // @grafana/identity-access-team
 	github.com/patrickmn/go-cache v2.1.0+incompatible // @grafana/alerting-backend
-	github.com/pgvector/pgvector-go v0.3.0 // @grafana/grafana-search-and-storage
+	github.com/pgvector/pgvector-go v0.4.1 // @grafana/grafana-search-and-storage
 	github.com/pressly/goose/v3 v3.27.2 // @grafana/identity-access-team
 	github.com/prometheus/alertmanager v0.33.0 // @grafana/alerting-backend
 	github.com/prometheus/client_golang v1.23.2 // @grafana/alerting-backend
@@ -228,7 +228,7 @@ require (
 	k8s.io/kube-openapi v0.0.0-20260317180543-43fb72c5454a // @grafana/grafana-app-platform-squad
 	k8s.io/utils v0.0.0-20260210185600-b8788abfbbc2 // @grafana/data-sources-plugins
 	pgregory.net/rapid v1.3.0 // @grafana/grafana-operator-experience-squad
-	sigs.k8s.io/randfill v1.0.0 // @grafana/grafana-app-platform-squad
+	sigs.k8s.io/randfill v1.0.0 // indirect; @grafana/grafana-app-platform-squad
 	sigs.k8s.io/structured-merge-diff/v6 v6.4.2 // @grafana/grafana-app-platform-squad
 	xorm.io/builder v0.3.13 // @grafana/grafana-backend-group
 )
