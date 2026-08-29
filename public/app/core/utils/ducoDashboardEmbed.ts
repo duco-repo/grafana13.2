@@ -40,6 +40,14 @@ const MAX_LANGUAGE_LENGTH = 64;
 const MAX_ORIGIN_LENGTH = 2048;
 const MAX_MENU_LABEL_LENGTH = 120;
 const MAX_MENU_ACTION_LENGTH = 128;
+const DEFAULT_DASHBOARD_PANEL_MENU_ITEMS: DucoPanelMenuItem[] = [
+  {
+    id: 'deepdiveData',
+    icon: 'search',
+    label: 'Deepdive data',
+    action: 'deepdiveData',
+  },
+];
 
 let runtimeMessageListenerRegistered = false;
 
@@ -90,7 +98,10 @@ export function getDucoDashboardPanelMenuItems(): DucoPanelMenuItem[] {
     return [];
   }
 
-  return sanitizePanelMenuItems(getDucoGrafanaRuntime()?.panelMenuItems);
+  const configuredItems = getDucoGrafanaRuntime()?.panelMenuItems;
+  return configuredItems === undefined
+    ? DEFAULT_DASHBOARD_PANEL_MENU_ITEMS.map((item) => ({ ...item }))
+    : sanitizePanelMenuItems(configuredItems);
 }
 
 export function emitDucoPanelMenuAction(item: DucoPanelMenuItem, context: DucoPanelMenuActionContext): void {

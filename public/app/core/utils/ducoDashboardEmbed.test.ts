@@ -81,6 +81,17 @@ describe('Duco Grafana embed runtime', () => {
     );
   });
 
+  it('retains the established panel action for older Studio bootstrap payloads', () => {
+    setRuntime({ mode: 'dashboardEmbed' });
+
+    expect(getDucoDashboardPanelMenuItems()).toEqual([
+      { id: 'deepdiveData', label: 'Deepdive data', action: 'deepdiveData', icon: 'search' },
+    ]);
+
+    setRuntime({ mode: 'dashboardEmbed', panelMenuItems: [] });
+    expect(getDucoDashboardPanelMenuItems()).toEqual([]);
+  });
+
   it('accepts sanitized runtime updates only from the configured parent origin', () => {
     setRuntime({ mode: 'dashboardEmbed', parentOrigin: window.location.origin });
 
