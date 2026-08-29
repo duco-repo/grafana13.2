@@ -146,8 +146,8 @@ export class Branding {
   static LoginBackground = LoginBackground;
   static MenuLogo = MenuLogo;
   static LoginBoxBackground = LoginBoxBackground;
-  static AppTitle = 'Grafana';
-  static LoginTitle = 'Welcome to Grafana';
+  static AppTitle = 'Duco Insights';
+  static LoginTitle = 'Welcome to Duco Insights';
   static HideEdition = false;
   static GetLoginSubTitle = (): null | string => {
     return null;

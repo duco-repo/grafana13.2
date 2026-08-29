@@ -29,6 +29,10 @@ jest.mock('@grafana/runtime', () => ({
 
 jest.mock('app/core/hooks/useMediaQueryMinWidth');
 
+jest.mock('app/core/components/SplashScreenModal/SplashScreenModal', () => ({
+  SplashScreenModal: () => <div role="dialog" aria-label="What's new in Grafana" />,
+}));
+
 jest.mock('./ExtensionSidebar/ExtensionSidebar', () => ({
   ...jest.requireActual('./ExtensionSidebar/ExtensionSidebar'),
   ExtensionSidebar: () => <div data-testid="ext-sidebar-stub" />,
@@ -150,6 +154,12 @@ describe('AppChrome', () => {
     waitFor(() => {
       expect(screen.queryByRole('link', { name: 'Skip to main content' })).not.toBeInTheDocument();
     });
+  });
+
+  it('does not render Grafana promotional chrome', () => {
+    setup(<Page navId="child1">Children</Page>);
+
+    expect(screen.queryByRole('dialog', { name: "What's new in Grafana" })).not.toBeInTheDocument();
   });
 
   describe('scopes dashboard drawer padding', () => {

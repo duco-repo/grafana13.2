@@ -5,6 +5,7 @@ import { PageLayoutType } from '@grafana/data';
 import { type SceneComponentProps } from '@grafana/scenes';
 import { Page } from 'app/core/components/Page/Page';
 import { getNavModel } from 'app/core/selectors/navModel';
+import { isDucoDashboardEmbed } from 'app/core/utils/ducoDashboardEmbed';
 import { useScopesServices } from 'app/features/scopes/ScopesContextProvider';
 import { useSelector } from 'app/types/store';
 
@@ -27,15 +28,17 @@ export function DashboardSceneRenderer({ model }: SceneComponentProps<DashboardS
     isEditing,
     layoutOrchestrator,
   } = model.useState();
+  const dashboardEmbed = isDucoDashboardEmbed();
 
   const scopesServices = useScopesServices();
 
-  // Disable scope redirects while in edit mode so users aren't navigated away mid-edit.
-  // Also close the scopes dashboards drawer while editing and restore it on exit.
+  // Disable scope redirects while editing or embedded so Duco owns navigation.
+  // Also close the scopes dashboards drawer while redirects are suppressed and restore it on exit.
   useEffect(() => {
-    scopesServices?.scopesSelectorService.setRedirectEnabled(!isEditing);
+    const redirectsSuppressed = isEditing || dashboardEmbed;
+    scopesServices?.scopesSelectorService.setRedirectEnabled(!redirectsSuppressed);
 
-    const drawerWasOpen = Boolean(isEditing && scopesServices?.scopesDashboardsService.state.drawerOpened);
+    const drawerWasOpen = Boolean(redirectsSuppressed && scopesServices?.scopesDashboardsService.state.drawerOpened);
     if (drawerWasOpen) {
       scopesServices?.scopesDashboardsService.toggleDrawer();
     }
@@ -46,7 +49,7 @@ export function DashboardSceneRenderer({ model }: SceneComponentProps<DashboardS
         scopesServices?.scopesDashboardsService.toggleDrawer();
       }
     };
-  }, [scopesServices, isEditing]);
+  }, [scopesServices, isEditing, dashboardEmbed]);
 
   const { type } = useParams();
   const location = useLocation();
@@ -78,7 +81,7 @@ export function DashboardSceneRenderer({ model }: SceneComponentProps<DashboardS
     }
   }, [isSettingsOpen, editPanel, viewPanel, model]);
 
-  if (editview) {
+  if (!dashboardEmbed && editview) {
     return (
       <>
         <editview.Component model={editview} />
@@ -101,6 +104,20 @@ export function DashboardSceneRenderer({ model }: SceneComponentProps<DashboardS
     }
 
     return <body.Component model={body} />;
+  }
+
+  if (dashboardEmbed) {
+    return (
+      <>
+        {layoutOrchestrator && <layoutOrchestrator.Component model={layoutOrchestrator} />}
+        <DashboardSidebarSplitter
+          dashboard={model}
+          isEditing={false}
+          controls={controls && <controls.Component model={controls} />}
+          body={renderBody()}
+        />
+      </>
+    );
   }
 
   return (

@@ -86,14 +86,13 @@ function getStyles(theme: GrafanaTheme2) {
       top: -1,
       boxSizing: 'content-box',
       alignItems: 'center',
-      background: theme.colors.background.secondary,
+      background: 'transparent',
       color: theme.colors.text.primary,
-      border: `1px solid ${theme.colors.border.weak}`,
-      borderBottomLeftRadius: theme.shape.radius.default,
+      border: 'none',
       height: theme.spacing(4),
-      boxShadow: theme.shadows.z1,
+      boxShadow: 'none',
       gap: theme.spacing(1),
-      padding: theme.spacing(0, 1),
+      padding: theme.spacing(0, 0.25),
     }),
     square: css({
       display: 'flex',
@@ -113,6 +112,13 @@ function getStyles(theme: GrafanaTheme2) {
       // Background and border are overriden when topnav toggle is disabled
       background: 'inherit',
       border: 'none',
+      padding: '2px 12px',
+      '&[aria-expanded="true"]': {
+        display: 'block',
+        opacity: 1,
+        background: theme.colors.background.secondary,
+        border: `1px solid ${theme.colors.border.medium}`,
+      },
     }),
     draggableIcon: css({
       transform: 'rotate(45deg)',

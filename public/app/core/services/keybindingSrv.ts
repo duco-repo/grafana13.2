@@ -2,6 +2,7 @@ import { toggleAssistant, isAssistantAvailable } from '@grafana/assistant';
 import { LegacyGraphHoverClearEvent, SetPanelAttentionEvent, locationUtil } from '@grafana/data';
 import { type LocationService } from '@grafana/runtime';
 import { appEvents } from 'app/core/app_events';
+import { isDucoDashboardEmbed, isDucoGrafanaEmbed } from 'app/core/utils/ducoDashboardEmbed';
 import { getExploreUrl } from 'app/core/utils/explore';
 import { toggleMockApiAndReload, togglePseudoLocale } from 'app/dev-utils';
 import { SaveDashboardDrawer } from 'app/features/dashboard/components/SaveDashboard/SaveDashboardDrawer';
@@ -43,6 +44,10 @@ export class KeybindingSrv {
 
   clearAndInitGlobalBindings(route: RouteDescriptor) {
     mousetrap.reset();
+
+    if (isDucoGrafanaEmbed()) {
+      return;
+    }
 
     // Chromeless pages like login and signup page don't get any global bindings
     if (!route.chromeless) {
@@ -227,6 +232,10 @@ export class KeybindingSrv {
   }
 
   setupTimeRangeBindings(updateUrl = true) {
+    if (isDucoDashboardEmbed()) {
+      return;
+    }
+
     this.bind('t a', () => {
       appEvents.publish(new AbsoluteTimeEvent({ updateUrl }));
     });
@@ -265,6 +274,10 @@ export class KeybindingSrv {
   }
 
   setupDashboardBindings(dashboard: DashboardModel) {
+    if (isDucoDashboardEmbed()) {
+      return;
+    }
+
     this.bind('mod+o', () => {
       dashboard.graphTooltip = (dashboard.graphTooltip + 1) % 3;
       dashboard.events.publish(new LegacyGraphHoverClearEvent());

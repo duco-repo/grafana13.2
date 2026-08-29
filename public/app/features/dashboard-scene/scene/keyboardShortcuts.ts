@@ -8,6 +8,7 @@ import { createSuccessNotification } from 'app/core/copy/appNotification';
 import { notifyApp } from 'app/core/reducers/appNotification';
 import { KeybindingSet } from 'app/core/services/KeybindingSet';
 import { contextSrv } from 'app/core/services/context_srv';
+import { isDucoDashboardEmbed } from 'app/core/utils/ducoDashboardEmbed';
 import { getLayoutType } from 'app/features/dashboard/utils/tracking';
 import { InspectTab } from 'app/features/inspector/types';
 import { dispatch } from 'app/store/store';
@@ -30,6 +31,10 @@ import { RowsLayoutManager } from './layout-rows/RowsLayoutManager';
 import { TabsLayoutManager } from './layout-tabs/TabsLayoutManager';
 
 export function setupKeyboardShortcuts(scene: DashboardScene) {
+  if (isDucoDashboardEmbed()) {
+    return () => {};
+  }
+
   const keybindings = new KeybindingSet();
   let vizPanelPathId: string | null = null;
 

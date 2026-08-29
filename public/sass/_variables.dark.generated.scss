@@ -16,7 +16,7 @@ $theme-name: dark;
 
 // New Colors
 // -------------------------
-$blue-base: #3d71d9;
+$blue-base: #7757E0;
 $red-base: #d10e5c;
 $green-base: #1a7f4b;
 
@@ -34,7 +34,7 @@ $gray-6: #f4f5f8;
 
 $white: #ffffff;
 
-$layer2: #22252b;
+$layer2: #262731;
 
 // Accent colors
 // -------------------------
@@ -45,17 +45,17 @@ $purple: #9933cc;
 
 // Scaffolding
 // -------------------------
-$body-bg: #111217;
+$body-bg: #19191F;
 
-$text-color: rgb(204, 204, 220);
-$text-color-weak: rgba(204, 204, 220, 0.65);
+$text-color: rgb(204, 204, 228);
+$text-color-weak: rgba(204, 204, 228, 0.65);
 $text-color-emphasis: #ffffff;
 
 
 // Links
 // -------------------------
-$link-color: rgb(204, 204, 220);
-$link-color-disabled: rgba(204, 204, 220, 0.61);
+$link-color: rgb(204, 204, 228);
+$link-color-disabled: rgba(204, 204, 228, 0.61);
 $link-hover-color: #ffffff;
 
 // Typography
@@ -64,28 +64,28 @@ $text-muted: $text-color-weak;
 
 // Panel
 // -------------------------
-$panel-bg: #181b1f;
+$panel-bg: #1F2029;
 
 // page header
-$page-header-bg: #111217;
+$page-header-bg: #19191F;
 $page-header-shadow: inset 0px -4px 14px $dark-3;
-$page-header-border-color: #111217;
+$page-header-border-color: #19191F;
 
 // Graphite Target Editor
-$tight-form-func-bg: #22252b;
+$tight-form-func-bg: #262731;
 
 $code-tag-bg: $dark-1;
 $code-tag-border: $dark-9;
 
 // cards
-$card-background: #22252b;
-$card-background-hover: rgb(40, 43, 49);
+$card-background: #262731;
+$card-background-hover: rgb(44, 45, 55);
 $card-shadow: none;
 
 // Lists
 $list-item-bg: $card-background;
 
-$empty-list-cta-bg: #22252b;
+$empty-list-cta-bg: #262731;
 
 // Scrollbars
 $scrollbarBackground: #404357;
@@ -93,7 +93,7 @@ $scrollbarBackground2: $dark-10;
 
 // Tables
 // -------------------------
-$table-bg-accent: #22252b;
+$table-bg-accent: #262731;
 
 // Buttons
 // -------------------------
@@ -106,17 +106,17 @@ $btn-drag-image: '../img/grab_dark.svg';
 
 // Forms
 // -------------------------
-$input-bg: #111217;
+$input-bg: #19191F;
 
-$input-color: rgb(204, 204, 220);
-$input-border-color: rgba(204, 204, 220, 0.2);
+$input-color: rgb(204, 204, 228);
+$input-border-color: rgba(204, 204, 228, 0.2);
 
 // Dropdowns
 // -------------------------
-$dropdownBackground: #181b1f;
-$dropdownBorder: rgba(204, 204, 220, 0.12);
-$dropdownDividerTop: rgba(204, 204, 220, 0.12);
-$dropdownDividerBottom: rgba(204, 204, 220, 0.12);
+$dropdownBackground: #1F2029;
+$dropdownBorder: rgba(204, 204, 228, 0.12);
+$dropdownDividerTop: rgba(204, 204, 228, 0.12);
+$dropdownDividerBottom: rgba(204, 204, 228, 0.12);
 
 $dropdownLinkColor: $link-color;
 $dropdownLinkColorHover: $white;
@@ -125,8 +125,8 @@ $dropdownLinkBackgroundHover: $dark-9;
 
 // Menu dropdowns
 // -------------------------
-$menu-dropdown-bg: #181b1f;
-$menu-dropdown-hover-bg: rgba(204, 204, 220, 0.16);
+$menu-dropdown-bg: #1F2029;
+$menu-dropdown-hover-bg: rgba(204, 204, 228, 0.14);
 $menu-dropdown-shadow: 0px 8px 24px rgb(1, 4, 9);
 
 // Form states and alerts
@@ -139,16 +139,16 @@ $alert-info-bg: #ff9900;
 // Tooltips and popovers
 // -------------------------
 $tooltipLinkColor: $link-color;
-$tooltipExternalLinkColor: #6e9fff;
+$tooltipExternalLinkColor: #8D74E7;
 $graph-tooltip-bg: $dark-1;
 
-$tooltipBackground: #22252b;
-$tooltipColor: rgb(204, 204, 220);
+$tooltipBackground: #262731;
+$tooltipColor: rgb(204, 204, 228);
 
-$popover-bg: #181b1f;
-$popover-color: rgb(204, 204, 220);
-$popover-border-color: rgba(204, 204, 220, 0.12);
-$popover-header-bg: #22252b;
+$popover-bg: #1F2029;
+$popover-color: rgb(204, 204, 228);
+$popover-border-color: rgba(204, 204, 228, 0.12);
+$popover-header-bg: #262731;
 $popover-shadow: 0px 8px 24px rgb(1, 4, 9);
 
 $popover-help-bg: $tooltipBackground;

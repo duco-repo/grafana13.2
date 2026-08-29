@@ -5,6 +5,16 @@ import { type GrafanaTheme2 } from '@grafana/data';
 export function getMarkdownStyles(theme: GrafanaTheme2) {
   return css({
     '.markdown-html': {
+      '&:focus-visible': {
+        outline: 'none',
+        boxShadow: 'none',
+      },
+
+      '& :focus-visible': {
+        outline: 'none',
+        boxShadow: 'none',
+      },
+
       img: {
         maxWidth: '100%',
       },

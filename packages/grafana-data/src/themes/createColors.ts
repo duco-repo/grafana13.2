@@ -127,7 +127,7 @@ class DarkColors implements ThemeColorsBase<Partial<ThemeRichColor>> {
   mode: ThemeColorsMode = 'dark';
 
   // Used to get more white opacity colors
-  whiteBase = '204, 204, 220';
+  whiteBase = '204, 204, 228';
 
   border = {
     weak: `rgba(${this.whiteBase}, 0.12)`,
@@ -191,7 +191,7 @@ class DarkColors implements ThemeColorsBase<Partial<ThemeRichColor>> {
   };
 
   action = {
-    hover: `rgba(${this.whiteBase}, 0.16)`,
+    hover: `rgba(${this.whiteBase}, 0.14)`,
     selected: `rgba(${this.whiteBase}, 0.12)`,
     selectedBorder: palette.orangeDarkMain,
     focus: `rgba(${this.whiteBase}, 0.16)`,
@@ -202,8 +202,8 @@ class DarkColors implements ThemeColorsBase<Partial<ThemeRichColor>> {
   };
 
   gradients = {
-    brandHorizontal: 'linear-gradient(270deg, #F55F3E 0%, #FF8833 100%)',
-    brandVertical: 'linear-gradient(0.01deg, #F55F3E 0.01%, #FF8833 99.99%)',
+    brandHorizontal: 'linear-gradient(270deg, #A340C8 0%, #5749FE 100%)',
+    brandVertical: 'linear-gradient(0.01deg, #A340C8 0.01%, #5749FE 99.99%)',
   };
 
   scrollbar = `rgba(${this.whiteBase}, 0.3)`;
@@ -295,8 +295,8 @@ class LightColors implements ThemeColorsBase<Partial<ThemeRichColor>> {
   };
 
   gradients = {
-    brandHorizontal: 'linear-gradient(90deg, #FF8833 0%, #F53E4C 100%)',
-    brandVertical: 'linear-gradient(0.01deg, #F53E4C -31.2%, #FF8833 113.07%)',
+    brandHorizontal: 'linear-gradient(90deg, #B630FE 0%, #715AE2 100%)',
+    brandVertical: 'linear-gradient(0.01deg, #B630FE -31.2%, #715AE2 113.07%)',
   };
 
   scrollbar = `rgba(${this.blackBase}, 0.3)`;

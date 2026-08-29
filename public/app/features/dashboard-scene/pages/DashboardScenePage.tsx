@@ -9,6 +9,7 @@ import { Box } from '@grafana/ui';
 import { Page } from 'app/core/components/Page/Page';
 import PageLoader from 'app/core/components/PageLoader/PageLoader';
 import { type GrafanaRouteComponentProps } from 'app/core/navigation/types';
+import { isDucoDashboardEmbed } from 'app/core/utils/ducoDashboardEmbed';
 import {
   DashboardBrandingFooter,
   DashboardBrandingFooterVariant,
@@ -154,26 +155,35 @@ export function DashboardScenePage({ route, queryParams, location }: Props) {
   // `locationSearchToObject()` parses `?kiosk` as `true` (boolean param). Some clients can emit `?kiosk=`, which parses as ''.
   const isKioskMode = queryParams.kiosk === '1' || queryParams.kiosk === true || queryParams.kiosk === '';
   const hideFooter = shouldHideDashboardKioskFooter(queryParams.hideLogo);
+  const dashboardEmbed = isDucoDashboardEmbed();
 
   return (
     <UrlSyncContextProvider scene={dashboard} updateUrlOnInit={true} createBrowserHistorySteps={true}>
-      <DashboardPreviewBanner queryParams={queryParams} route={route.routeName} slug={slug} path={path} />
-      <DashboardConversionWarningBanner dashboard={dashboard} />
-      <ScriptedDashboardDeprecationBanner isScripted={type === 'script'} />
-      <OrphanedDashboardBanner dashboard={dashboard} />
-      <SuggestedDashboardsBanner route={route.routeName} dashboard={dashboard} />
-      <DashboardTemplateSavedBanner />
-      <DashboardTemplateUseBanner dashboard={dashboard} />
-      <DashboardTemplateEditBanner dashboard={dashboard} />
+      {!dashboardEmbed && (
+        <>
+          <DashboardPreviewBanner queryParams={queryParams} route={route.routeName} slug={slug} path={path} />
+          <DashboardConversionWarningBanner dashboard={dashboard} />
+          <ScriptedDashboardDeprecationBanner isScripted={type === 'script'} />
+          <OrphanedDashboardBanner dashboard={dashboard} />
+          <SuggestedDashboardsBanner route={route.routeName} dashboard={dashboard} />
+          <DashboardTemplateSavedBanner />
+          <DashboardTemplateUseBanner dashboard={dashboard} />
+          <DashboardTemplateEditBanner dashboard={dashboard} />
+        </>
+      )}
       <dashboard.Component model={dashboard} key={dashboard.state.key} />
-      <DashboardPrompt dashboard={dashboard} />
-      {showCustomTemplates && <TemplateDashboardModal />}
-      <DashboardBrandingFooter
-        variant={DashboardBrandingFooterVariant.Kiosk}
-        paddingX={2}
-        useMinHeight={true}
-        hide={!isKioskMode || hideFooter}
-      />
+      {!dashboardEmbed && (
+        <>
+          <DashboardPrompt dashboard={dashboard} />
+          {showCustomTemplates && <TemplateDashboardModal />}
+          <DashboardBrandingFooter
+            variant={DashboardBrandingFooterVariant.Kiosk}
+            paddingX={2}
+            useMinHeight={true}
+            hide={!isKioskMode || hideFooter}
+          />
+        </>
+      )}
     </UrlSyncContextProvider>
   );
 }

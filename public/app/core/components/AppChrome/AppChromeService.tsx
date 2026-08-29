@@ -5,6 +5,7 @@ import { useObservable } from '@grafana/data/unstable';
 import { t } from '@grafana/i18n';
 import { config, HistoryWrapper, locationService, reportInteraction } from '@grafana/runtime';
 import { appEvents } from 'app/core/app_events';
+import { isDucoGrafanaEmbed } from 'app/core/utils/ducoDashboardEmbed';
 import { isShallowEqual } from 'app/core/utils/isShallowEqual';
 import { KioskMode } from 'app/types/dashboard';
 
@@ -81,9 +82,16 @@ export class AppChromeService {
     }
 
     Object.assign(newState, update);
+    const ducoEmbed = isDucoGrafanaEmbed();
 
     // KioskMode overrides chromeless state
-    newState.chromeless = newState.kioskMode === KioskMode.Full || this.currentRoute?.chromeless;
+    if (ducoEmbed) {
+      newState.actions = undefined;
+      newState.breadcrumbActions = undefined;
+      newState.megaMenuOpen = false;
+    }
+
+    newState.chromeless = ducoEmbed || newState.kioskMode === KioskMode.Full || this.currentRoute?.chromeless;
 
     if (!this.ignoreStateUpdate(newState, current)) {
       this.state.next(newState);

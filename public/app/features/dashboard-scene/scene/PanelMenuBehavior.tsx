@@ -20,6 +20,11 @@ import { appEvents } from 'app/core/app_events';
 import { createErrorNotification } from 'app/core/copy/appNotification';
 import { notifyApp } from 'app/core/reducers/appNotification';
 import { contextSrv } from 'app/core/services/context_srv';
+import {
+  emitDucoPanelMenuAction,
+  getDucoDashboardPanelMenuItems,
+  isDucoDashboardEmbed,
+} from 'app/core/utils/ducoDashboardEmbed';
 import { getMessageFromError } from 'app/core/utils/errors';
 import { isOnPrem } from 'app/core/utils/isOnPrem';
 import { LogMessages, logInfo, trackCreateRuleFromPanelDrawerOpened } from 'app/features/alerting/unified/Analytics';
@@ -56,12 +61,49 @@ export function panelMenuBehavior(menu: VizPanelMenu) {
     // hm.. add another generic param to SceneObject to specify parent type?
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     const panel = menu.parent as VizPanel;
-    const plugin = panel.getPlugin();
-
-    const items: PanelMenuItem[] = [];
-    const moreSubMenu: PanelMenuItem[] = [];
     const dashboard = getDashboardSceneFor(panel);
     const { isEmbedded } = dashboard.state.meta;
+
+    if (isDucoDashboardEmbed()) {
+      const isViewingPanel = dashboard.state.viewPanel === panel.getPathId();
+      const embedItems: PanelMenuItem[] = [
+        {
+          text: t('panel.header-menu.view', 'View'),
+          iconClassName: 'eye',
+          href: locationUtil.getUrlForPartial(locationService.getLocation(), {
+            viewPanel: isViewingPanel ? undefined : panel.getPathId(),
+            editPanel: undefined,
+          }),
+          onClick: () => {
+            DashboardInteractions.panelActionClicked('view', getPanelIdForVizPanel(panel), 'panel');
+          },
+        },
+      ];
+
+      for (const item of getDucoDashboardPanelMenuItems()) {
+        embedItems.push({
+          text: item.label,
+          iconClassName: item.icon,
+          onClick: (event: React.MouseEvent) => {
+            event.preventDefault();
+            emitDucoPanelMenuAction(item, {
+              dashboardUid: dashboard.state.uid,
+              dashboardTitle: dashboard.state.title,
+              panelId: getPanelIdForVizPanel(panel) ?? panel.getPathId(),
+              panelTitle: panel.state.title,
+              panelType: panel.state.pluginId,
+            });
+          },
+        });
+      }
+
+      menu.setState({ items: embedItems });
+      return;
+    }
+
+    const plugin = panel.getPlugin();
+    const items: PanelMenuItem[] = [];
+    const moreSubMenu: PanelMenuItem[] = [];
     const exploreMenuItem = await getExploreMenuItem(panel);
     const isReadOnlyRepeat = isRepeatCloneOrChildOf(panel);
 

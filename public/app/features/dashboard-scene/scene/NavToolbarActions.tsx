@@ -10,6 +10,7 @@ import { AppChromeUpdate } from 'app/core/components/AppChrome/AppChromeUpdate';
 import { NavToolbarSeparator } from 'app/core/components/AppChrome/NavToolbar/NavToolbarSeparator';
 import { LS_PANEL_COPY_KEY } from 'app/core/constants';
 import { contextSrv } from 'app/core/services/context_srv';
+import { isDucoDashboardEmbed } from 'app/core/utils/ducoDashboardEmbed';
 import { getDashboardSrv } from 'app/features/dashboard/services/DashboardSrv';
 import { trackDashboardSceneEditButtonClicked } from 'app/features/dashboard-scene/utils/tracking';
 import { playlistSrv } from 'app/features/playlist/PlaylistSrv';
@@ -39,6 +40,10 @@ interface Props {
 }
 
 export const NavToolbarActions = memo<Props>(({ dashboard }) => {
+  if (isDucoDashboardEmbed()) {
+    return <AppChromeUpdate actions={undefined} breadcrumbActions={undefined} />;
+  }
+
   const hasNewToolbar = config.featureToggles.dashboardNewLayouts;
 
   return hasNewToolbar ? (
@@ -91,6 +96,10 @@ export function ToolbarActions({ dashboard }: Props) {
   const { isReadOnlyRepo, repoType } = useGetResourceRepositoryView({
     folderName: folderUid,
   });
+
+  if (isDucoDashboardEmbed()) {
+    return null;
+  }
 
   if (!isEditingPanel) {
     // This adds the presence indicators in enterprise

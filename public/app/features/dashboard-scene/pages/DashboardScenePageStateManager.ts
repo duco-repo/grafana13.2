@@ -15,6 +15,7 @@ import {
 import { markAsUrlRewrite } from 'app/core/navigation/urlRewrite';
 import { StateManagerBase } from 'app/core/services/StateManagerBase';
 import { contextSrv } from 'app/core/services/context_srv';
+import { getDucoDashboardEmbedMeta, isDucoDashboardEmbed } from 'app/core/utils/ducoDashboardEmbed';
 import { getMessageFromError, getMessageIdFromError, getStatusFromError } from 'app/core/utils/errors';
 import { startMeasure, stopMeasure } from 'app/core/utils/metrics';
 import {
@@ -184,6 +185,26 @@ export function getSceneCreationOptions(
   }
 
   return undefined;
+}
+
+function applyDucoDashboardEmbedToScene(scene: DashboardScene): DashboardScene {
+  if (!isDucoDashboardEmbed()) {
+    return scene;
+  }
+
+  scene.setState({
+    editable: false,
+    isEditing: false,
+    editPanel: undefined,
+    editview: undefined,
+    inspectPanelKey: undefined,
+    overlay: undefined,
+    shareView: undefined,
+    viewPanel: undefined,
+    meta: getDucoDashboardEmbedMeta(scene.state.meta),
+  });
+
+  return scene;
 }
 
 abstract class DashboardScenePageStateManagerBase<T>
@@ -615,7 +636,7 @@ abstract class DashboardScenePageStateManagerBase<T>
 export class DashboardScenePageStateManager extends DashboardScenePageStateManagerBase<DashboardDTO> {
   transformResponseToScene(rsp: DashboardDTO | null, options: LoadDashboardOptions): DashboardScene | null {
     // Public dashboards are not part of a session and therefore should not use the cache
-    const skipSceneCache = options.route === DashboardRoutes.Public;
+    const skipSceneCache = options.route === DashboardRoutes.Public || isDucoDashboardEmbed();
 
     if (!skipSceneCache) {
       const fromCache = this.getSceneFromCache(options.uid);
@@ -636,7 +657,7 @@ export class DashboardScenePageStateManager extends DashboardScenePageStateManag
 
     if (rsp?.dashboard) {
       const sceneCreationOptions = getSceneCreationOptions(options, rsp.meta);
-      const scene = transformSaveModelToScene(rsp, options, sceneCreationOptions);
+      const scene = applyDucoDashboardEmbedToScene(transformSaveModelToScene(rsp, options, sceneCreationOptions));
 
       // Special handling for Template route - set up edit mode and dirty state
       if (
@@ -942,6 +963,7 @@ export class DashboardScenePageStateManager extends DashboardScenePageStateManag
     }
 
     const uid = dashboard.state.uid;
+    const skipSceneCache = isDucoDashboardEmbed();
 
     try {
       this.setState({ isLoading: true });
@@ -949,7 +971,7 @@ export class DashboardScenePageStateManager extends DashboardScenePageStateManag
       const fetchStart = performance.now();
       const rsp = await dashboardLoaderSrv.loadDashboard('db', dashboard.state.meta.slug, uid, queryParams);
       recordDashboardFetchTiming(uid, performance.now() - fetchStart);
-      const fromCache = this.getSceneFromCache(uid);
+      const fromCache = skipSceneCache ? undefined : this.getSceneFromCache(uid);
 
       // check if cached db version is same as both
       // response and current db state. There are scenarios where they can differ
@@ -984,14 +1006,16 @@ export class DashboardScenePageStateManager extends DashboardScenePageStateManag
       }
 
       const sceneCreationOptions = getSceneCreationOptions(undefined, rsp.meta);
-      const scene = transformSaveModelToScene(rsp, undefined, sceneCreationOptions);
+      const scene = applyDucoDashboardEmbedToScene(transformSaveModelToScene(rsp, undefined, sceneCreationOptions));
 
       // we need to call and restore dashboard state on every reload that pulls a new dashboard version
       if (config.featureToggles.preserveDashboardStateWhenNavigating && Boolean(uid)) {
         restoreDashboardStateFromLocalStorage(scene);
       }
 
-      this.setSceneCache(uid, scene);
+      if (!skipSceneCache) {
+        this.setSceneCache(uid, scene);
+      }
       this.setState({ dashboard: scene, isLoading: false });
     } catch (err) {
       const status = getStatusFromError(err);
@@ -1091,7 +1115,7 @@ export class DashboardScenePageStateManagerV2 extends DashboardScenePageStateMan
     options: LoadDashboardOptions
   ): DashboardScene | null {
     // Public dashboards are not part of a session and therefore should not use the cache
-    const skipSceneCache = options.route === DashboardRoutes.Public;
+    const skipSceneCache = options.route === DashboardRoutes.Public || isDucoDashboardEmbed();
 
     if (!skipSceneCache) {
       const fromCache = this.getSceneFromCache(options.uid);
@@ -1113,7 +1137,7 @@ export class DashboardScenePageStateManagerV2 extends DashboardScenePageStateMan
     }
 
     if (rsp) {
-      const scene = transformSaveModelSchemaV2ToScene(rsp, options);
+      const scene = applyDucoDashboardEmbedToScene(transformSaveModelSchemaV2ToScene(rsp, options));
 
       // Special handling for Template route - set up edit mode and dirty state
       if (
@@ -1309,6 +1333,7 @@ export class DashboardScenePageStateManagerV2 extends DashboardScenePageStateMan
     }
 
     const uid = dashboard.state.uid;
+    const skipSceneCache = isDucoDashboardEmbed();
 
     try {
       this.setState({ isLoading: true });
@@ -1316,7 +1341,7 @@ export class DashboardScenePageStateManagerV2 extends DashboardScenePageStateMan
       const fetchStart = performance.now();
       const rsp = await this.dashboardLoader.loadDashboard('db', dashboard.state.meta.slug, uid, queryParams);
       recordDashboardFetchTiming(uid, performance.now() - fetchStart);
-      const fromCache = this.getSceneFromCache(uid);
+      const fromCache = skipSceneCache ? undefined : this.getSceneFromCache(uid);
 
       if (
         fromCache &&
@@ -1343,14 +1368,16 @@ export class DashboardScenePageStateManagerV2 extends DashboardScenePageStateMan
 
       // Re-apply predefined variables so param-triggered reloads keep the injected variables.
       const reloadOptions = await this.enrichLoadOptions(rsp, { uid, route: DashboardRoutes.Normal });
-      const scene = transformSaveModelSchemaV2ToScene(rsp, reloadOptions);
+      const scene = applyDucoDashboardEmbedToScene(transformSaveModelSchemaV2ToScene(rsp, reloadOptions));
 
       // we need to call and restore dashboard state on every reload that pulls a new dashboard version
       if (config.featureToggles.preserveDashboardStateWhenNavigating && Boolean(uid)) {
         restoreDashboardStateFromLocalStorage(scene);
       }
 
-      this.setSceneCache(uid, scene);
+      if (!skipSceneCache) {
+        this.setSceneCache(uid, scene);
+      }
 
       this.setState({ dashboard: scene, isLoading: false });
     } catch (err) {

@@ -24,6 +24,7 @@ import {
 import { Box, Button, ButtonGroup, useStyles2 } from '@grafana/ui';
 import { useGrafana } from 'app/core/context/GrafanaContext';
 import { contextSrv } from 'app/core/services/context_srv';
+import { isDucoDashboardEmbed } from 'app/core/utils/ducoDashboardEmbed';
 import { playlistSrv } from 'app/features/playlist/PlaylistSrv';
 import { ContextualNavigationPaneToggle } from 'app/features/scopes/dashboards/ContextualNavigationPaneToggle';
 import { KioskMode } from 'app/types/dashboard';
@@ -204,10 +205,11 @@ function DashboardControlsRenderer({ model }: SceneComponentProps<DashboardContr
     hideDashboardControls,
     hidePlaylistNav,
   } = model.useState();
+  const dashboardEmbed = isDucoDashboardEmbed();
 
   const dashboard = getDashboardSceneFor(model);
   const { links, editPanel } = dashboard.useState();
-  const styles = useStyles2(getStyles);
+  const styles = useStyles2(getStyles, dashboardEmbed);
   const showDebugger = window.location.search.includes('scene-debugger');
   const hasDashboardControls = useHasDashboardControls(dashboard);
   const panelEditVariables = getPanelEditVariables(dashboard);
@@ -218,7 +220,7 @@ function DashboardControlsRenderer({ model }: SceneComponentProps<DashboardContr
     // The controls row hosts the dashboard action buttons (with new layouts) and the panel edit
     // actions, so it must render even when the dashboard itself contributes no other controls.
     // DashboardControlActions handles the per-button visibility, including the sidebar cases.
-    if ((config.featureToggles.dashboardNewLayouts || editPanel) && kioskMode !== KioskMode.Full) {
+    if ((config.featureToggles.dashboardNewLayouts || editPanel) && !dashboardEmbed && kioskMode !== KioskMode.Full) {
       return (
         <>
           <div data-testid={selectors.pages.Dashboard.Controls} className={styles.controls}>
@@ -240,7 +242,7 @@ function DashboardControlsRenderer({ model }: SceneComponentProps<DashboardContr
     return (
       <Box padding={1}>
         <RenderHiddenVariables dashboard={dashboard} />
-        {editPanel && <PanelEditControls panelEditor={editPanel} />}
+        {editPanel && !dashboardEmbed && <PanelEditControls panelEditor={editPanel} />}
       </Box>
     );
   }
@@ -254,18 +256,20 @@ function DashboardControlsRenderer({ model }: SceneComponentProps<DashboardContr
             <refreshPicker.Component model={refreshPicker} />
           </div>
         )}
-        {(config.featureToggles.dashboardNewLayouts || editPanel) && (
+        {(config.featureToggles.dashboardNewLayouts || editPanel) && !dashboardEmbed && (
           <div className={styles.fixedControls}>
             <DashboardControlActions dashboard={dashboard} hidePlaylistNav={hidePlaylistNav} />
           </div>
         )}
-        {config.featureToggles.dashboardUnifiedDrilldownControls && !config.featureToggles.dashboardNewLayouts && (
-          <div className={styles.fixedControls}>
-            <DashboardFiltersOverviewPaneToggle dashboard={dashboard} />
-          </div>
-        )}
+        {config.featureToggles.dashboardUnifiedDrilldownControls &&
+          !dashboardEmbed &&
+          !config.featureToggles.dashboardNewLayouts && (
+            <div className={styles.fixedControls}>
+              <DashboardFiltersOverviewPaneToggle dashboard={dashboard} />
+            </div>
+          )}
       </div>
-      {config.featureToggles.scopeFilters && !editPanel && (
+      {config.featureToggles.scopeFilters && !dashboardEmbed && !editPanel && (
         <ContextualNavigationPaneToggle className={styles.contextualNavToggle} hideWhenOpen={true} />
       )}
       {!hideVariableControls && (
@@ -274,15 +278,19 @@ function DashboardControlsRenderer({ model }: SceneComponentProps<DashboardContr
           <DashboardDataLayerControls dashboard={dashboard} />
         </>
       )}
-      {!hideLinksControls && !editPanel && <DashboardLinksControls links={links} dashboard={dashboard} />}
-      {!hideDashboardControls && hasDashboardControls && <DashboardControlsButton dashboard={dashboard} />}
+      {!dashboardEmbed && !hideLinksControls && !editPanel && (
+        <DashboardLinksControls links={links} dashboard={dashboard} />
+      )}
+      {!dashboardEmbed && !hideDashboardControls && hasDashboardControls && (
+        <DashboardControlsButton dashboard={dashboard} />
+      )}
       <DefaultControlsLoadingSkeleton
         dashboard={dashboard}
         hideVariableControls={hideVariableControls}
-        hideLinksControls={hideLinksControls}
+        hideLinksControls={dashboardEmbed || hideLinksControls}
       />
-      {editPanel && <PanelEditControls panelEditor={editPanel} />}
-      {showDebugger && <SceneDebugger scene={model} key={'scene-debugger'} />}
+      {editPanel && !dashboardEmbed && <PanelEditControls panelEditor={editPanel} />}
+      {showDebugger && !dashboardEmbed && <SceneDebugger scene={model} key={'scene-debugger'} />}
     </div>
   );
 }
@@ -298,6 +306,10 @@ function DashboardControlActions({
   const { isPlaying } = playlistSrv.useState();
   const { chrome } = useGrafana();
   const { kioskMode } = chrome.useState();
+
+  if (isDucoDashboardEmbed()) {
+    return null;
+  }
 
   if (kioskMode === KioskMode.Full) {
     return null;
@@ -489,12 +501,12 @@ const getSkeletonStyles = (theme: GrafanaTheme2) => ({
   }),
 });
 
-function getStyles(theme: GrafanaTheme2) {
+function getStyles(theme: GrafanaTheme2, dashboardEmbed: boolean) {
   return {
     // Original controls style
     controls: css({
       gap: theme.spacing(1),
-      padding: theme.spacing(2, 2, 1, 2),
+      padding: theme.spacing(2, 2, 1, dashboardEmbed ? 7 : 2),
       flexDirection: 'row',
       flexWrap: 'nowrap',
       position: 'relative',

@@ -88,7 +88,7 @@ export function getDashboardGridStyles(theme: GrafanaTheme2) {
         outline: `1px dashed ${theme.colors.border.strong}`,
         outlineOffset: '0px',
         borderRadius: theme.shape.radius.default,
-        backgroundColor: theme.colors.emphasize(theme.colors.background.canvas, 0.08),
+        backgroundColor: theme.colors.emphasize(theme.colors.background.canvas, 0.05),
       },
     },
 

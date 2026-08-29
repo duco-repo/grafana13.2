@@ -1,5 +1,4 @@
 import { css, cx } from '@emotion/css';
-import { useBooleanFlagValue } from '@openfeature/react-sdk';
 import classNames from 'clsx';
 import { Resizable } from 're-resizable';
 import { type PropsWithChildren, useCallback, useEffect, useRef, useState } from 'react';
@@ -10,9 +9,9 @@ import { Trans } from '@grafana/i18n';
 import { locationSearchToObject, locationService, useScopes } from '@grafana/runtime';
 import { useFlagGrafanaVisualDesignRefresh } from '@grafana/runtime/internal';
 import { ErrorBoundaryAlert, floatingUtils, getDragStyles, LinkButton, useStyles2 } from '@grafana/ui';
-import { SplashScreenModal } from 'app/core/components/SplashScreenModal/SplashScreenModal';
 import { useGrafana } from 'app/core/context/GrafanaContext';
 import { useMediaQueryMinWidth } from 'app/core/hooks/useMediaQueryMinWidth';
+import { isDucoDashboardEmbed } from 'app/core/utils/ducoDashboardEmbed';
 import { CommandPalette } from 'app/features/commandPalette/CommandPalette';
 import { ScopesDashboards } from 'app/features/scopes/dashboards/ScopesDashboards';
 
@@ -48,7 +47,6 @@ export function AppChrome({ children }: Props) {
   } = useExtensionSidebarContext();
   const state = chrome.useState();
   const scopes = useScopes();
-  const isSplashScreenEnabled = useBooleanFlagValue('splashScreen', false);
 
   const { fullscreenWorkspaceActive, fullscreenWorkspaceFeatureFlagEnabled } = useFullscreenWorkspace();
 
@@ -97,9 +95,11 @@ export function AppChrome({ children }: Props) {
     chrome.setMegaMenuOpen(!state.megaMenuOpen);
   };
 
+  const dashboardEmbed = isDucoDashboardEmbed();
+
   const { pathname, search } = locationService.getLocation();
   const url = pathname + search;
-  const shouldShowReturnToPrevious = state.returnToPrevious && url !== state.returnToPrevious.href;
+  const shouldShowReturnToPrevious = !dashboardEmbed && state.returnToPrevious && url !== state.returnToPrevious.href;
 
   // Clear returnToPrevious when the page is manually navigated to
   useEffect(() => {
@@ -222,7 +222,6 @@ export function AppChrome({ children }: Props) {
       </div>
       {!state.chromeless && !state.megaMenuDocked && <AppChromeMenu />}
       {!state.chromeless && <CommandPalette />}
-      {!state.chromeless && isSplashScreenEnabled && <SplashScreenModal />}
       {!state.chromeless && <FeatureControlFloating />}
       {shouldShowReturnToPrevious && state.returnToPrevious && (
         <ReturnToPrevious href={state.returnToPrevious.href} title={state.returnToPrevious.title} />

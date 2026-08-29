@@ -6,6 +6,7 @@ import { AlertLabels, StateIcon } from '@grafana/alerting/unstable';
 import { type DataSourceInstanceSettings, type GrafanaTheme2 } from '@grafana/data';
 import { Trans, t } from '@grafana/i18n';
 import { Alert, Stack, Text, TextLink, Tooltip, useStyles2 } from '@grafana/ui';
+import { isDucoAlertingEmbed } from 'app/core/utils/ducoDashboardEmbed';
 import {
   type Rule,
   type RuleGroupIdentifierV2,
@@ -114,7 +115,7 @@ export const AlertRuleListItem = (props: AlertRuleListItemProps) => {
     );
   }
 
-  if (querySourceUIDs.length > 0) {
+  if (!isDucoAlertingEmbed() && querySourceUIDs.length > 0) {
     metadata.push(<QuerySourceIcons queriedDatasourceUIDs={querySourceUIDs} />);
   }
 
@@ -231,7 +232,7 @@ export function RecordingRuleListItem({
     );
   }
 
-  if (querySourceUIDs.length > 0) {
+  if (!isDucoAlertingEmbed() && querySourceUIDs.length > 0) {
     metadata.push(<QuerySourceIcons queriedDatasourceUIDs={querySourceUIDs} />);
   }
 

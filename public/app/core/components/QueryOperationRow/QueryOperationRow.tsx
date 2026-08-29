@@ -149,6 +149,7 @@ export function QueryOperationRow({
 const getQueryOperationRowStyles = (theme: GrafanaTheme2) => {
   return {
     wrapper: css({
+      padding: theme.spacing(0.5, 0),
       marginBottom: theme.spacing(2),
     }),
     content: css({

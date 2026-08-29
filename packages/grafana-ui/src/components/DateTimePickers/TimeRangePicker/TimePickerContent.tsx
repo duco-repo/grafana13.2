@@ -18,7 +18,6 @@ import { useStyles2, useTheme2 } from '../../../themes/ThemeContext';
 import { getFocusStyles } from '../../../themes/mixins';
 import { FilterInput } from '../../FilterInput/FilterInput';
 import { Icon } from '../../Icon/Icon';
-import { TextLink } from '../../Link/TextLink';
 import { type WeekStart } from '../WeekStartPicker';
 
 import { TimePickerFooter } from './TimePickerFooter';
@@ -246,29 +245,7 @@ const FullScreenForm = (props: FormProps) => {
   );
 };
 
-const EmptyRecentList = memo(() => {
-  const styles = useStyles2(getEmptyListStyles);
-  const emptyRecentListText = t(
-    'time-picker.content.empty-recent-list-info',
-    "It looks like you haven't used this time picker before. As soon as you enter some time intervals, recently used intervals will appear here."
-  );
-
-  return (
-    <div className={styles.container}>
-      <div>
-        <span>{emptyRecentListText}</span>
-      </div>
-      <Trans i18nKey="time-picker.content.empty-recent-list-docs">
-        <div>
-          <TextLink href="https://grafana.com/docs/grafana/latest/dashboards/time-range-controls" external>
-            Read the documentation
-          </TextLink>
-          <span> to find out more about how to enter custom time ranges.</span>
-        </div>
-      </Trans>
-    </div>
-  );
-});
+const EmptyRecentList = memo(() => null);
 
 function mapToHistoryOptions(ranges?: TimeRange[], timeZone?: TimeZone): TimeOption[] {
   if (!Array.isArray(ranges) || ranges.length === 0) {
@@ -381,16 +358,5 @@ const getFullScreenStyles = (theme: GrafanaTheme2, hideQuickRanges?: boolean) =>
     flexDirection: 'column',
     justifyContent: 'flex-end',
     paddingTop: theme.spacing(1),
-  }),
-});
-
-const getEmptyListStyles = (theme: GrafanaTheme2) => ({
-  container: css({
-    padding: '12px',
-    margin: '12px',
-
-    'a, span': {
-      fontSize: '13px',
-    },
   }),
 });

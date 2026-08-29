@@ -96,6 +96,7 @@ import { JourneyRegistryImpl } from './core/services/journey/JourneyRegistryImpl
 import { JourneyTrackerImpl } from './core/services/journey/JourneyTrackerImpl';
 import { JOURNEY_REGISTRY } from './core/services/journey/journeyRegistry';
 import { KeybindingSrv } from './core/services/keybindingSrv';
+import { getDucoGrafanaRuntimeLanguage } from './core/utils/ducoDashboardEmbed';
 import { startMeasure, stopMeasure } from './core/utils/metrics';
 import { initAlerting } from './features/alerting/unified/initAlerting';
 import { getTimeSrv } from './features/dashboard/services/TimeSrv';
@@ -173,6 +174,11 @@ export class GrafanaApp {
         } catch (err) {
           console.error('Failed to initialize OpenFeature provider', err);
         }
+      }
+
+      const ducoRuntimeLanguage = getDucoGrafanaRuntimeLanguage();
+      if (ducoRuntimeLanguage) {
+        contextSrv.user.language = ducoRuntimeLanguage;
       }
 
       const initI18nPromise = initializeI18n({
