@@ -79,6 +79,7 @@ export function buildTestScene() {
 describe('DashboardSidebarRenderer', () => {
   beforeEach(() => {
     config.featureToggles.dashboardNewLayouts = true;
+    delete window.__ducoGrafanaRuntime;
     // Sidebar state is persisted to localStorage — clear between tests so each test
     // starts with the default visibility/dock state.
     window.localStorage.clear();
@@ -87,6 +88,27 @@ describe('DashboardSidebarRenderer', () => {
   afterEach(() => {
     jest.clearAllMocks();
     window.localStorage.clear();
+    delete window.__ducoGrafanaRuntime;
+  });
+
+  it('never mounts the dashboard sidebar in a Duco embed', () => {
+    window.__ducoGrafanaRuntime = { mode: 'dashboardEmbed' };
+    const scene = buildTestScene();
+
+    act(() => activateFullSceneTree(scene));
+
+    render(
+      <DashboardSidebarSplitter
+        dashboard={scene}
+        controls={<div>Embedded controls</div>}
+        body={<div>Embedded dashboard</div>}
+      />
+    );
+
+    expect(screen.getByText('Embedded controls')).toBeInTheDocument();
+    expect(screen.getByText('Embedded dashboard')).toBeInTheDocument();
+    expect(screen.queryByTestId(selectors.components.Sidebar.container)).not.toBeInTheDocument();
+    expect(screen.queryByTestId(selectors.components.Sidebar.showHideToggle)).not.toBeInTheDocument();
   });
 
   it('Should render sidebar', async () => {

@@ -17,6 +17,7 @@ import {
 } from '@grafana/ui';
 import NativeScrollbar, { DivScrollElement } from 'app/core/components/NativeScrollbar';
 import { useGrafana } from 'app/core/context/GrafanaContext';
+import { isDucoDashboardEmbed } from 'app/core/utils/ducoDashboardEmbed';
 import { getDashboardSrv } from 'app/features/dashboard/services/DashboardSrv';
 import { playlistSrv } from 'app/features/playlist/PlaylistSrv';
 import { KioskMode } from 'app/types/dashboard';
@@ -39,11 +40,31 @@ interface Props {
 }
 
 export function DashboardSidebarSplitter(props: Props) {
+  if (isDucoDashboardEmbed()) {
+    return <DashboardSidebarSplitterEmbedded {...props} />;
+  }
+
   if (config.featureToggles.dashboardNewLayouts) {
     return <DashboardSidebarSplitterNewLayouts {...props} />;
   } else {
     return <DashboardSidebarSplitterLegacy {...props} />;
   }
+}
+
+function DashboardSidebarSplitterEmbedded({ dashboard, body, controls }: Props) {
+  const styles = useStyles2(getStyles);
+
+  return (
+    <div className={styles.container}>
+      <DashboardControlsChrome>{controls}</DashboardControlsChrome>
+      <div
+        className={cx(styles.bodyWrapper, styles.bodyWrapperKiosk)}
+        data-testid={selectors.components.DashboardSidebarSplitter.primaryBody}
+      >
+        <NativeScrollbar onSetScrollRef={dashboard.onSetScrollRef}>{body}</NativeScrollbar>
+      </div>
+    </div>
+  );
 }
 
 function DashboardSidebarSplitterLegacy({ dashboard, body, controls }: Props) {
