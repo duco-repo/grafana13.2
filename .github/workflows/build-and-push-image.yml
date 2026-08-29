@@ -1,0 +1,122 @@
+name: Build and push Duco Grafana 13.2 image
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: duco-grafana-image-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  IMAGE_REPOSITORY: gf13built
+  EXPECTED_GRAFANA_VERSION: 13.2.0
+  PLATFORMS: linux/amd64
+
+jobs:
+  image:
+    name: Build and push gf13built
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@d7f5e7f509e45cec5c76c4d5afdd7de93d0b3df5 # v4.1.0
+
+      - name: Resolve image metadata
+        id: image
+        shell: bash
+        env:
+          REGISTRY: ${{ secrets.IMG_REG_HOST }}
+        run: |
+          set -euo pipefail
+
+          version="$(node -p "require('./package.json').version")"
+
+          if [[ "${version}" != "${EXPECTED_GRAFANA_VERSION}" ]]; then
+            echo "package.json version ${version} does not match expected Grafana version ${EXPECTED_GRAFANA_VERSION}"
+            exit 1
+          fi
+
+          if [[ -z "${REGISTRY}" ]]; then
+            echo "IMG_REG_HOST is empty"
+            exit 1
+          fi
+
+          image="${REGISTRY%/}/${IMAGE_REPOSITORY}"
+          short_sha="${GITHUB_SHA::12}"
+          source_date_epoch="$(git show -s --format=%ct HEAD)"
+
+          {
+            echo "image=${image}"
+            echo "version=${version}"
+            echo "short_sha=${short_sha}"
+            echo "source_date_epoch=${source_date_epoch}"
+          } >> "${GITHUB_OUTPUT}"
+
+      - name: Log in to ACR
+        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+        with:
+          registry: ${{ secrets.IMG_REG_HOST }}
+          username: ${{ secrets.IMG_REG_USERNAME }}
+          password: ${{ secrets.IMG_REG_PASSWORD }}
+
+      - name: Build and push image
+        id: build
+        uses: docker/build-push-action@f9f3042f7e2789586610d6e8b85c8f03e5195baf # v7.2.0
+        with:
+          context: .
+          file: ./Dockerfile
+          platforms: ${{ env.PLATFORMS }}
+          push: true
+          pull: true
+          tags: |
+            ${{ steps.image.outputs.image }}:${{ steps.image.outputs.version }}
+            ${{ steps.image.outputs.image }}:sha-${{ steps.image.outputs.short_sha }}
+          labels: |
+            org.opencontainers.image.title=Duco Grafana
+            org.opencontainers.image.description=Duco-customized Grafana 13.2
+            org.opencontainers.image.version=${{ steps.image.outputs.version }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+          # Production resolves and pins the single ACR Docker manifest digest.
+          provenance: false
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            COMMIT_SHA=${{ github.sha }}
+            BUILD_BRANCH=${{ github.ref_name }}
+            SOURCE_DATE_EPOCH=${{ steps.image.outputs.source_date_epoch }}
+
+      - name: Record published image
+        shell: bash
+        env:
+          IMAGE: ${{ steps.image.outputs.image }}
+          VERSION: ${{ steps.image.outputs.version }}
+          SHORT_SHA: ${{ steps.image.outputs.short_sha }}
+          DIGEST: ${{ steps.build.outputs.digest }}
+        run: |
+          set -euo pipefail
+
+          if [[ -z "${DIGEST}" ]]; then
+            echo "Buildx did not return a published digest"
+            exit 1
+          fi
+
+          {
+            echo "### Published Duco Grafana image"
+            echo
+            echo "- Version tag: \`${IMAGE}:${VERSION}\`"
+            echo "- Commit tag: \`${IMAGE}:sha-${SHORT_SHA}\`"
+            echo "- Manifest digest: \`${DIGEST}\`"
+          } >> "${GITHUB_STEP_SUMMARY}"
