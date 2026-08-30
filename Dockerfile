@@ -402,3 +402,16 @@ CMD ["cfg:default.log.mode=console"]
 # Default stage — alpine. Builds without --target produce an alpine image.
 # Use --target=final-ubuntu to build the ubuntu variant instead.
 FROM final-alpine
+
+ARG GF_UID="472"
+ARG GF_GID="0"
+ARG DUCO_PLUGIN_LOCK_SHA256=""
+
+LABEL com.duco.grafana.plugins-lock-sha256="${DUCO_PLUGIN_LOCK_SHA256}"
+
+COPY --chown=${GF_UID}:${GF_GID} packaging/duco "$GF_PATHS_HOME/duco"
+
+RUN HOME="$GF_PATHS_HOME" bash "$GF_PATHS_HOME/duco/install-plugins.sh" \
+  "$GF_PATHS_HOME/duco/plugins.lock" \
+  "$GF_PATHS_HOME/data/plugins-bundled" \
+  "$DUCO_PLUGIN_LOCK_SHA256"

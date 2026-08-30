@@ -56,12 +56,16 @@ jobs:
           image="${REGISTRY%/}/${IMAGE_REPOSITORY}"
           short_sha="${GITHUB_SHA::12}"
           source_date_epoch="$(git show -s --format=%ct HEAD)"
+          plugin_lock_sha256="$(sha256sum packaging/duco/plugins.lock | cut -d ' ' -f 1)"
+          plugin_count="$(awk 'NF == 2 && $1 !~ /^#/ { count++ } END { print count + 0 }' packaging/duco/plugins.lock)"
 
           {
             echo "image=${image}"
             echo "version=${version}"
             echo "short_sha=${short_sha}"
             echo "source_date_epoch=${source_date_epoch}"
+            echo "plugin_lock_sha256=${plugin_lock_sha256}"
+            echo "plugin_count=${plugin_count}"
           } >> "${GITHUB_OUTPUT}"
 
       - name: Log in to ACR
@@ -89,6 +93,7 @@ jobs:
             org.opencontainers.image.version=${{ steps.image.outputs.version }}
             org.opencontainers.image.revision=${{ github.sha }}
             org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
+            com.duco.grafana.plugins-lock-sha256=${{ steps.image.outputs.plugin_lock_sha256 }}
           # Production resolves and pins the single ACR Docker manifest digest.
           provenance: false
           cache-from: type=gha
@@ -97,6 +102,7 @@ jobs:
             COMMIT_SHA=${{ github.sha }}
             BUILD_BRANCH=${{ github.ref_name }}
             SOURCE_DATE_EPOCH=${{ steps.image.outputs.source_date_epoch }}
+            DUCO_PLUGIN_LOCK_SHA256=${{ steps.image.outputs.plugin_lock_sha256 }}
 
       - name: Record published image
         shell: bash
@@ -105,6 +111,8 @@ jobs:
           VERSION: ${{ steps.image.outputs.version }}
           SHORT_SHA: ${{ steps.image.outputs.short_sha }}
           DIGEST: ${{ steps.build.outputs.digest }}
+          PLUGIN_COUNT: ${{ steps.image.outputs.plugin_count }}
+          PLUGIN_LOCK_SHA256: ${{ steps.image.outputs.plugin_lock_sha256 }}
         run: |
           set -euo pipefail
 
@@ -119,4 +127,6 @@ jobs:
             echo "- Version tag: \`${IMAGE}:${VERSION}\`"
             echo "- Commit tag: \`${IMAGE}:sha-${SHORT_SHA}\`"
             echo "- Manifest digest: \`${DIGEST}\`"
+            echo "- Baked plugins: \`${PLUGIN_COUNT}\`"
+            echo "- Plugin lock SHA-256: \`${PLUGIN_LOCK_SHA256}\`"
           } >> "${GITHUB_STEP_SUMMARY}"

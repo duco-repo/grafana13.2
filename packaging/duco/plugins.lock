@@ -1,0 +1,8 @@
+# Plugin ID                              Version
+grafana-clickhouse-datasource            4.21.1
+yesoreyeram-infinity-datasource           3.11.1
+grafana-mqtt-datasource                   1.3.6
+prometheus                                13.1.7
+grafana-postgresql-datasource             13.0.1
+grafana-graphviz-panel                    0.0.7
+tobiasworkstech-parquets3-datasource      1.2.16
