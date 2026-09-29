@@ -189,6 +189,7 @@ func CreateMiddlewares(cfg *setting.Cfg, oAuthTokenService oauthtoken.OAuthToken
 		clientmiddleware.NewTracingMiddleware(tracer),
 		clientmiddleware.NewMetricsMiddleware(promRegisterer, registry),
 		clientmiddleware.NewContextualLoggerMiddleware(),
+		clientmiddleware.NewQueryTimeRangeMiddleware(cfg.QueryMaxTimeRange),
 	}
 
 	if cfg.PluginLogBackendRequests {

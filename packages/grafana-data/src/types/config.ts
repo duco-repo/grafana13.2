@@ -329,6 +329,7 @@ export interface GrafanaConfig {
   exploreDefaultTimeOffset: string;
   exploreHideLogsDownload: boolean;
   quickRanges?: TimeOption[];
+  queryMaxTimeRangeMs?: number;
   pluginRestrictedAPIsAllowList?: Record<string, string[]>;
   pluginRestrictedAPIsBlockList?: Record<string, string[]>;
   openFeatureContext: Record<string, unknown>;

@@ -260,6 +260,7 @@ export class GrafanaBootConfig {
   exploreDefaultTimeOffset = '1h';
   exploreHideLogsDownload?: boolean;
   quickRanges?: TimeOption[];
+  queryMaxTimeRangeMs?: number;
   pluginRestrictedAPIsAllowList?: Record<string, string[]>;
   pluginRestrictedAPIsBlockList?: Record<string, string[]>;
 

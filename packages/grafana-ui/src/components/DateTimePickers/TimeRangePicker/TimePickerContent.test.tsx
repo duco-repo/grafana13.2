@@ -22,13 +22,13 @@ describe('TimePickerContent', () => {
       expect(await screen.findByText(/2019-10-18 07:50:27 to 2019-10-18 07:51:27/i)).toBeInTheDocument();
     });
 
-    it('renders with empty history', async () => {
+    it('does not render a placeholder for empty history', () => {
       renderComponent({ value: absoluteValue });
       expect(
-        await screen.findByText(
+        screen.queryByText(
           /it looks like you haven't used this time picker before\. as soon as you enter some time intervals, recently used intervals will appear here\./i
         )
-      ).toBeInTheDocument();
+      ).not.toBeInTheDocument();
       expect(screen.queryByText(/recently used absolute ranges/i)).not.toBeInTheDocument();
     });
 

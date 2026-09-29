@@ -413,8 +413,9 @@ type Cfg struct {
 
 	Anonymous AnonymousSettings
 
-	DateFormats DateFormats
-	QuickRanges QuickRanges
+	DateFormats       DateFormats
+	QuickRanges       QuickRanges
+	QueryMaxTimeRange time.Duration
 
 	// User
 	UserInviteMaxLifetime        time.Duration
@@ -1854,6 +1855,9 @@ func (cfg *Cfg) parseINIFile(iniFile *ini.File) error {
 	cfg.ScopesListDashboardsURL = scopesSection.Key("list_dashboards_endpoint").MustString("")
 
 	// Time picker settings
+	if err := cfg.readQueryTimeRange(); err != nil {
+		return err
+	}
 	if err := cfg.readTimePicker(); err != nil {
 		return err
 	}

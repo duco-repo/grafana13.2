@@ -302,8 +302,9 @@ type FrontendSettingsDTO struct {
 	CloudMigrationIsTarget       bool `json:"cloudMigrationIsTarget"`
 	CloudMigrationPollIntervalMs int  `json:"cloudMigrationPollIntervalMs"`
 
-	DateFormats setting.DateFormats  `json:"dateFormats,omitempty"`
-	QuickRanges []setting.QuickRange `json:"quickRanges,omitempty"`
+	DateFormats         setting.DateFormats  `json:"dateFormats,omitempty"`
+	QuickRanges         []setting.QuickRange `json:"quickRanges,omitempty"`
+	QueryMaxTimeRangeMs int64                `json:"queryMaxTimeRangeMs,omitempty"`
 
 	LoginError string `json:"loginError,omitempty"`
 

@@ -2,6 +2,7 @@ package frontendsettings
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -48,6 +49,7 @@ func TestGetBaseFrontendSettings(t *testing.T) {
 		cfg.AppURL = "https://grafana.example.com/"
 		cfg.AppSubURL = "/grafana"
 		cfg.Anonymous.Enabled = true
+		cfg.QueryMaxTimeRange = 366 * 24 * time.Hour
 
 		license := &licensing.OSSLicensingService{Cfg: cfg}
 
@@ -58,6 +60,7 @@ func TestGetBaseFrontendSettings(t *testing.T) {
 		assert.Equal(t, "https://grafana.example.com/", settings.AppUrl)
 		assert.Equal(t, "/grafana", settings.AppSubUrl)
 		assert.True(t, settings.AnonymousEnabled)
+		assert.Equal(t, int64(31_622_400_000), settings.QueryMaxTimeRangeMs)
 	})
 
 	t.Run("enables trusted types policy when CSP template requires it", func(t *testing.T) {

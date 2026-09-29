@@ -16,9 +16,11 @@ import { t, Trans } from '@grafana/i18n';
 
 import { useStyles2, useTheme2 } from '../../../themes/ThemeContext';
 import { getFocusStyles } from '../../../themes/mixins';
+import { Alert } from '../../Alert/Alert';
 import { FilterInput } from '../../FilterInput/FilterInput';
 import { Icon } from '../../Icon/Icon';
 import { type WeekStart } from '../WeekStartPicker';
+import { getQueryTimeRangeError } from '../utils/queryTimeRangeLimit';
 
 import { TimePickerFooter } from './TimePickerFooter';
 import { TimePickerTitle } from './TimePickerTitle';
@@ -63,7 +65,7 @@ export const TimePickerContentWithScreenSize = (props: PropsWithScreenSize) => {
     timeZone,
     fiscalYearStartMonth,
     value,
-    onChange,
+    onChange: onChangeFromProps,
     history,
     showHistory,
     className,
@@ -78,6 +80,14 @@ export const TimePickerContentWithScreenSize = (props: PropsWithScreenSize) => {
   const historyOptions = mapToHistoryOptions(history, timeZone);
   const baseTimeOption = useTimeOption(value.raw, quickOptions);
   const [searchTerm, setSearchQuery] = useState('');
+  const [rangeError, setRangeError] = useState<string>();
+  const onChange = (range: TimeRange) => {
+    const error = getQueryTimeRangeError(range);
+    setRangeError(error);
+    if (!error) {
+      onChangeFromProps(range);
+    }
+  };
 
   const { filteredQuickOptions, customTimeOption } = useMemo(() => {
     const filtered = quickOptions.filter((o) => o.display.toLowerCase().includes(searchTerm.toLowerCase()));
@@ -102,6 +112,7 @@ export const TimePickerContentWithScreenSize = (props: PropsWithScreenSize) => {
 
   return (
     <div id="TimePickerContent" className={cx(styles.container, className)}>
+      {rangeError && <Alert severity="error" title={rangeError} />}
       <div className={styles.body}>
         {(!isFullscreen || !hideQuickRanges) && (
           <div className={styles.rightSide}>
@@ -115,7 +126,7 @@ export const TimePickerContentWithScreenSize = (props: PropsWithScreenSize) => {
               />
             </div>
             <div className={styles.scrollContent}>
-              {!isFullscreen && <NarrowScreenForm {...props} historyOptions={historyOptions} />}
+              {!isFullscreen && <NarrowScreenForm {...props} onChange={onChange} historyOptions={historyOptions} />}
               {!hideQuickRanges && (
                 <TimeRangeList options={filteredQuickOptions} onChange={onChangeTimeOption} value={timeOption} />
               )}
@@ -124,7 +135,7 @@ export const TimePickerContentWithScreenSize = (props: PropsWithScreenSize) => {
         )}
         {isFullscreen && (
           <div className={styles.leftSide}>
-            <FullScreenForm {...props} historyOptions={historyOptions} />
+            <FullScreenForm {...props} onChange={onChange} historyOptions={historyOptions} />
           </div>
         )}
       </div>
