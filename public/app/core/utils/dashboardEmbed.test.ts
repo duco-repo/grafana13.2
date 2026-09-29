@@ -2,7 +2,6 @@ import { type DashboardMeta } from 'app/types/dashboard';
 
 import {
   getDashboardEmbedMeta,
-  getDashboardPanelMenuItems,
   getGrafanaRuntimeLanguage,
   isAlertingEmbed,
   isDashboardEmbed,
@@ -81,17 +80,6 @@ describe('Grafana embed runtime', () => {
     );
   });
 
-  it('supplies a default panel action when the host omits its menu configuration', () => {
-    setRuntime({ mode: 'dashboardEmbed' });
-
-    expect(getDashboardPanelMenuItems()).toEqual([
-      { id: 'deepdiveData', label: 'Deepdive data', action: 'deepdiveData', icon: 'search' },
-    ]);
-
-    setRuntime({ mode: 'dashboardEmbed', panelMenuItems: [] });
-    expect(getDashboardPanelMenuItems()).toEqual([]);
-  });
-
   it('accepts sanitized runtime updates only from the configured parent origin', () => {
     setRuntime({ mode: 'dashboardEmbed', parentOrigin: window.location.origin });
 
@@ -103,22 +91,9 @@ describe('Grafana embed runtime', () => {
 
     postRuntimeUpdate(window.location.origin, {
       language: ' sv-SE ',
-      panelMenuItems: [
-        { label: ' Deepdive data ', action: ' deepdiveData ', icon: 'search' },
-        { label: 'Missing action' },
-        { label: 'Fallback icon', action: 'fallbackIcon', icon: 'not-a-grafana-icon' },
-      ],
     });
 
     expect(getGrafanaRuntimeLanguage()).toBe('sv-SE');
-    expect(getDashboardPanelMenuItems()).toEqual([
-      { id: 'deepdiveData', label: 'Deepdive data', action: 'deepdiveData', icon: 'search' },
-      { id: 'fallbackIcon', label: 'Fallback icon', action: 'fallbackIcon', icon: 'external-link-alt' },
-    ]);
-
-    postRuntimeUpdate(window.location.origin, { panelMenuItems: [] });
-    expect(getDashboardPanelMenuItems()).toEqual([]);
-
     postRuntimeUpdate(window.location.origin, { mode: 'alertingEmbed', parentOrigin: 'javascript:alert(1)' });
     expect(isDashboardEmbed()).toBe(false);
     expect(isAlertingEmbed()).toBe(true);

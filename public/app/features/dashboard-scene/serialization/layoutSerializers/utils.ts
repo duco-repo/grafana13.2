@@ -24,12 +24,14 @@ import {
   type DataQueryKind,
   defaultPanelQueryKind,
 } from '@grafana/schema/apis/dashboard.grafana.app/v2';
+import { isDashboardEmbed } from 'app/core/utils/dashboardEmbed';
 import { SHARED_DASHBOARD_QUERY } from 'app/plugins/datasource/dashboard/constants';
 import { MIXED_DATASOURCE_NAME } from 'app/plugins/datasource/mixed/MixedDataSource';
 
 import { ConditionalRenderingGroup } from '../../conditional-rendering/group/ConditionalRenderingGroup';
 import { DashboardDatasourceBehaviour } from '../../scene/DashboardDatasourceBehaviour';
 import { type DashboardScene } from '../../scene/DashboardScene';
+import { EmbeddedPanelViewButton } from '../../scene/EmbeddedPanelViewButton';
 import { LibraryPanelBehavior } from '../../scene/LibraryPanelBehavior';
 import { VizPanelLinks, VizPanelLinksMenu } from '../../scene/PanelLinks';
 import { panelLinksBehavior, panelMenuBehavior } from '../../scene/PanelMenuBehavior';
@@ -138,15 +140,17 @@ export function buildVizPanel(panel: PanelKind, id?: number): VizPanel {
  * and therefore require a DashboardScene ancestor.
  */
 function addDashboardPanelChrome(vizPanelState: VizPanelState): void {
-  vizPanelState.headerActions = new VizPanelHeaderActions({
-    hideGroupByAction: !config.featureToggles.dashboardUnifiedDrilldownControls,
-  });
+  vizPanelState.headerActions = isDashboardEmbed()
+    ? new EmbeddedPanelViewButton({})
+    : new VizPanelHeaderActions({
+        hideGroupByAction: !config.featureToggles.dashboardUnifiedDrilldownControls,
+      });
   vizPanelState.subHeader = new VizPanelSubHeader({
     hideNonApplicableDrilldowns: !config.featureToggles.perPanelNonApplicableDrilldowns,
   });
   vizPanelState.extendPanelContext = setDashboardPanelContext;
 
-  if (!config.publicDashboardAccessToken) {
+  if (!config.publicDashboardAccessToken && !isDashboardEmbed()) {
     vizPanelState.menu = new VizPanelMenu({
       $behaviors: [panelMenuBehavior],
     });

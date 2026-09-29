@@ -21,6 +21,7 @@ import {
   LocalValueVariable,
 } from '@grafana/scenes';
 import { isWeekStart } from '@grafana/ui';
+import { isDashboardEmbed } from 'app/core/utils/dashboardEmbed';
 import { getK8sV1DashboardApiConfig } from 'app/features/dashboard/api/v1';
 import {
   getDashboardSceneProfilerWithMetadata,
@@ -44,6 +45,7 @@ import { DashboardDataLayerSet } from '../scene/DashboardDataLayerSet';
 import { registerDashboardMacro } from '../scene/DashboardMacro';
 import { DashboardReloadBehavior } from '../scene/DashboardReloadBehavior';
 import { DashboardScene } from '../scene/DashboardScene';
+import { EmbeddedPanelViewButton } from '../scene/EmbeddedPanelViewButton';
 import { LibraryPanelBehavior } from '../scene/LibraryPanelBehavior';
 import { VizPanelLinks, VizPanelLinksMenu } from '../scene/PanelLinks';
 import { panelLinksBehavior, panelMenuBehavior } from '../scene/PanelMenuBehavior';
@@ -493,9 +495,11 @@ export function buildGridItemForPanel(panel: PanelModel): DashboardGridItem {
     hoverHeaderOffset: 0,
     $data: createPanelDataProvider(panel),
     titleItems,
-    headerActions: new VizPanelHeaderActions({
-      hideGroupByAction: !config.featureToggles.dashboardUnifiedDrilldownControls,
-    }),
+    headerActions: isDashboardEmbed()
+      ? new EmbeddedPanelViewButton({})
+      : new VizPanelHeaderActions({
+          hideGroupByAction: !config.featureToggles.dashboardUnifiedDrilldownControls,
+        }),
     subHeader: new VizPanelSubHeader({
       hideNonApplicableDrilldowns: !config.featureToggles.perPanelNonApplicableDrilldowns,
     }),
@@ -513,7 +517,7 @@ export function buildGridItemForPanel(panel: PanelModel): DashboardGridItem {
     vizPanelState.$data = undefined;
   }
 
-  if (!config.publicDashboardAccessToken) {
+  if (!config.publicDashboardAccessToken && !isDashboardEmbed()) {
     vizPanelState.menu = new VizPanelMenu({
       $behaviors: [panelMenuBehavior],
     });

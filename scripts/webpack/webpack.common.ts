@@ -103,7 +103,6 @@ export default (env: Env = {}): Configuration => ({
     new webpack.EnvironmentPlugin({
       GRAFANA_EMBED_RUNTIME_PROPERTY: '__grafanaEmbedRuntime',
       GRAFANA_EMBED_RUNTIME_MESSAGE_TYPE: 'grafana:runtime:update',
-      GRAFANA_EMBED_PANEL_ACTION_MESSAGE_TYPE: 'grafana:panel-menu-action',
     }),
   ],
   module: {

@@ -1,14 +1,6 @@
-import { toIconName, type IconName } from '@grafana/data';
 import { type DashboardMeta } from 'app/types/dashboard';
 
 type GrafanaEmbedMode = 'dashboardEmbed' | 'alertingEmbed';
-
-export interface PanelMenuItem {
-  id?: string;
-  icon?: IconName;
-  label: string;
-  action: string;
-}
 
 interface GrafanaRuntime {
   mode?: GrafanaEmbedMode;
@@ -16,15 +8,6 @@ interface GrafanaRuntime {
   alertingEmbed?: boolean;
   language?: string;
   parentOrigin?: string;
-  panelMenuItems?: PanelMenuItem[];
-}
-
-interface PanelMenuActionContext {
-  dashboardUid?: string;
-  dashboardTitle?: string;
-  panelId?: number | string;
-  panelTitle?: string;
-  panelType?: string;
 }
 
 declare global {
@@ -35,21 +18,8 @@ declare global {
 
 const RUNTIME_PROPERTY = process.env.GRAFANA_EMBED_RUNTIME_PROPERTY || '__grafanaEmbedRuntime';
 const RUNTIME_UPDATE_MESSAGE_TYPE = process.env.GRAFANA_EMBED_RUNTIME_MESSAGE_TYPE || 'grafana:runtime:update';
-const PANEL_MENU_ACTION_MESSAGE_TYPE =
-  process.env.GRAFANA_EMBED_PANEL_ACTION_MESSAGE_TYPE || 'grafana:panel-menu-action';
-const MAX_PANEL_MENU_ITEMS = 12;
 const MAX_LANGUAGE_LENGTH = 64;
 const MAX_ORIGIN_LENGTH = 2048;
-const MAX_MENU_LABEL_LENGTH = 120;
-const MAX_MENU_ACTION_LENGTH = 128;
-const DEFAULT_DASHBOARD_PANEL_MENU_ITEMS: PanelMenuItem[] = [
-  {
-    id: 'deepdiveData',
-    icon: 'search',
-    label: 'Deepdive data',
-    action: 'deepdiveData',
-  },
-];
 
 let runtimeMessageListenerRegistered = false;
 
@@ -92,33 +62,6 @@ export function getGrafanaRuntimeLanguage(): string | undefined {
   return normalizeLanguage(getGrafanaRuntime()?.language) ?? getGrafanaUrlLanguage();
 }
 
-export function getDashboardPanelMenuItems(): PanelMenuItem[] {
-  if (!isDashboardEmbed()) {
-    return [];
-  }
-
-  const configuredItems = getGrafanaRuntime()?.panelMenuItems;
-  return configuredItems === undefined
-    ? DEFAULT_DASHBOARD_PANEL_MENU_ITEMS.map((item) => ({ ...item }))
-    : sanitizePanelMenuItems(configuredItems);
-}
-
-export function emitPanelMenuAction(item: PanelMenuItem, context: PanelMenuActionContext): void {
-  if (typeof window === 'undefined' || window.parent === window) {
-    return;
-  }
-
-  window.parent.postMessage(
-    {
-      type: PANEL_MENU_ACTION_MESSAGE_TYPE,
-      action: item.action,
-      item,
-      context,
-    },
-    getTrustedParentOrigin()
-  );
-}
-
 export function getDashboardEmbedMeta(meta: DashboardMeta | undefined): DashboardMeta | undefined {
   if (!isDashboardEmbed() || !meta) {
     return meta;
@@ -158,8 +101,6 @@ function sanitizeRuntime(value: unknown): GrafanaRuntime {
   const mode = value.mode === 'dashboardEmbed' || value.mode === 'alertingEmbed' ? value.mode : undefined;
   const language = normalizeLanguage(value.language);
   const parentOrigin = normalizeOrigin(value.parentOrigin);
-  const panelMenuItems = sanitizePanelMenuItems(value.panelMenuItems);
-  const hasPanelMenuItems = Array.isArray(value.panelMenuItems);
 
   return {
     ...(mode ? { mode } : {}),
@@ -171,34 +112,7 @@ function sanitizeRuntime(value: unknown): GrafanaRuntime {
         }),
     ...(language ? { language } : {}),
     ...(parentOrigin ? { parentOrigin } : {}),
-    ...(hasPanelMenuItems ? { panelMenuItems } : {}),
   };
-}
-
-function sanitizePanelMenuItems(value: unknown): PanelMenuItem[] {
-  if (!Array.isArray(value)) {
-    return [];
-  }
-
-  return value.slice(0, MAX_PANEL_MENU_ITEMS).reduce<PanelMenuItem[]>((items, rawItem) => {
-    if (!isRecord(rawItem)) {
-      return items;
-    }
-
-    const label = normalizeString(rawItem.label, MAX_MENU_LABEL_LENGTH);
-    const action = normalizeString(rawItem.action, MAX_MENU_ACTION_LENGTH);
-    if (!label || !action) {
-      return items;
-    }
-
-    items.push({
-      id: normalizeString(rawItem.id, MAX_MENU_ACTION_LENGTH) || action,
-      icon: toIconName(normalizeString(rawItem.icon)) ?? 'external-link-alt',
-      label,
-      action,
-    });
-    return items;
-  }, []);
 }
 
 function getGrafanaUrlLanguage(): string | undefined {
