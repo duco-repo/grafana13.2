@@ -25,7 +25,7 @@ function EmbeddedPanelViewButtonRenderer({ model }: SceneComponentProps<Embedded
   return (
     <Button
       className="show-on-hover"
-      icon={expanded ? 'compress-arrows' : 'expand-arrows'}
+      icon={<PanelViewIcon expanded={expanded} />}
       variant="secondary"
       fill="text"
       size="sm"
@@ -36,5 +36,21 @@ function EmbeddedPanelViewButtonRenderer({ model }: SceneComponentProps<Embedded
         locationService.partial({ viewPanel: expanded ? undefined : panel.getPathId(), editPanel: undefined })
       }
     />
+  );
+}
+
+function PanelViewIcon({ expanded, className }: { expanded: boolean; className?: string }) {
+  // Lucide Contributors: https://github.com/lucide-icons/lucide/blob/main/LICENSE
+  return (
+    <svg className={className} width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path
+        fill="none"
+        stroke="currentColor"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth="2"
+        d={expanded ? 'm14 10l7-7m-1 7h-6V4M3 21l7-7m-6 0h6v6' : 'M15 3h6v6m0-6l-7 7M3 21l7-7m-1 7H3v-6'}
+      />
+    </svg>
   );
 }
