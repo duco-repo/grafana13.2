@@ -5,7 +5,7 @@ import { t } from '@grafana/i18n';
 
 import { useStyles2 } from '../../themes/ThemeContext';
 
-import { BouncingLogo } from './BouncingLogo';
+import { LoadingLogo } from './LoadingLogo';
 
 export function PageLoader() {
   const styles = useStyles2(getStyles);
@@ -18,7 +18,7 @@ export function PageLoader() {
         role="status"
         aria-label={t('grafana-ui.page-loader.label', 'Loading')}
       >
-        <BouncingLogo />
+        <LoadingLogo />
       </div>
     </div>
   );
