@@ -24,6 +24,7 @@ function EmbeddedPanelViewButtonRenderer({ model }: SceneComponentProps<Embedded
 
   return (
     <Button
+      className="show-on-hover"
       icon={expanded ? 'compress-arrows' : 'expand-arrows'}
       variant="secondary"
       fill="text"
