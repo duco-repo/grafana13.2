@@ -5,11 +5,11 @@ import { BrandingContext } from '../Branding/BrandingContext';
 import { PageLoader } from './PageLoader';
 
 describe('PageLoader', () => {
-  it('renders the default Grafana logo when no branding is provided', () => {
+  it('renders the default GF Insight logo when no branding is provided', () => {
     render(<PageLoader />);
 
     expect(screen.getByRole('status')).toBeInTheDocument();
-    expect(screen.getByRole('img', { name: 'Grafana' })).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: 'GF Insight' })).toBeInTheDocument();
   });
 
   it('renders the branded logo supplied via BrandingContext', () => {
@@ -22,6 +22,6 @@ describe('PageLoader', () => {
     );
 
     expect(screen.getByTestId('branded-logo')).toBeInTheDocument();
-    expect(screen.queryByRole('img', { name: 'Grafana' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('img', { name: 'GF Insight' })).not.toBeInTheDocument();
   });
 });

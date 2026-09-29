@@ -124,7 +124,7 @@ describe('SoloPanelPageLogo', () => {
     render(<SoloPanelPageLogo containerRef={containerRef} isHovered={false} hideLogo={undefined} />);
 
     expect(screen.getByText('Powered by')).toBeInTheDocument();
-    expect(screen.getByAltText('Grafana')).toBeInTheDocument();
+    expect(screen.getByAltText('GF Insight')).toBeInTheDocument();
   });
 
   it('should hide logo when isHovered is true', () => {
@@ -171,7 +171,7 @@ describe('SoloPanelPageLogo', () => {
 
     // The logo should be visible
     expect(screen.getByText('Powered by')).toBeInTheDocument();
-    expect(screen.getByAltText('Grafana')).toBeInTheDocument();
+    expect(screen.getByAltText('GF Insight')).toBeInTheDocument();
   });
 
   it('should use dark logo in dark theme', () => {
@@ -197,7 +197,7 @@ describe('SoloPanelPageLogo', () => {
 
     render(<SoloPanelPageLogo containerRef={containerRef} isHovered={false} hideLogo={undefined} />);
 
-    const logo = screen.getByAltText('Grafana');
+    const logo = screen.getByAltText('GF Insight');
     expect(logo).toHaveAttribute('src', 'grafana-text-logo-light.svg');
   });
 
@@ -227,7 +227,7 @@ describe('SoloPanelPageLogo', () => {
 
     render(<SoloPanelPageLogo containerRef={containerRef} isHovered={false} hideLogo={undefined} />);
 
-    const logo = screen.getByAltText('Grafana');
+    const logo = screen.getByAltText('GF Insight');
     // Verify logo is rendered (the exact src depends on theme, which is tested in other tests)
     expect(logo).toBeInTheDocument();
     expect(logo).toHaveAttribute('src');

@@ -165,7 +165,7 @@ func (p *IndexProvider) HandleRequest(writer http.ResponseWriter, request *http.
 	ofrepRootUrlEnabled := ofClient.Boolean(ctx, featuremgmt.FlagGrafanaOfrepRootUrl, false, openfeature.TransactionContext(ctx))
 
 	data := IndexViewData{
-		AppTitle:                              "Grafana",
+		AppTitle:                              "GF Insight",
 		AppSubUrl:                             p.config.AppSubURL,
 		IsDevelopmentEnv:                      p.config.Env == setting.Dev,
 		Assets:                                assetsManifest,

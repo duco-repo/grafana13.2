@@ -101,7 +101,7 @@ export function SoloPanelPageLogo({ containerRef, isHovered, hideLogo }: SoloPan
       </span>
       <img
         src={grafanaLogo}
-        alt="Grafana"
+        alt="GF Insight"
         className={styles.logo}
         style={{
           height: `${16 * scale}px`,

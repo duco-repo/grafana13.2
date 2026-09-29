@@ -13,7 +13,7 @@ export function BouncingLogo() {
 
   // Use the branded logo supplied by the host app, falling back to the default Grafana icon.
   // This lets the loader pick up custom branding without the caller knowing.
-  const logo = AppLogo ? <AppLogo /> : <img src={grafanaIconSvg} alt="Grafana" />;
+  const logo = AppLogo ? <AppLogo /> : <img src={grafanaIconSvg} alt="GF Insight" />;
 
   return (
     <div className={styles.bounce}>

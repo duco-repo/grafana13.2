@@ -16,7 +16,7 @@
 
     <link rel="icon" type="image/png" href="[[.FavIcon]]" />
     <link rel="apple-touch-icon" sizes="180x180" href="[[.AppleTouchIcon]]" />
-    <link rel="mask-icon" href="[[.Assets.ContentDeliveryURL]]public/img/grafana_mask_icon.svg" color="#F05A28" />
+    <link rel="mask-icon" href="[[.Assets.ContentDeliveryURL]]public/img/grafana_mask_icon.svg" color="#613fcc" />
 
     [[range $asset := .Assets.CSSFiles]]
       <link rel="stylesheet" href="[[$asset.FilePath]]" />
@@ -205,7 +205,7 @@
     <div class="preloader">
       <div class="preloader__enter">
         <div class="preloader__bounce">
-          <div class="preloader__logo" aria-live="polite" role="status" aria-label="Loading Grafana"></div>
+          <div class="preloader__logo" aria-live="polite" role="status" aria-label="Loading GF Insight"></div>
         </div>
       </div>
       <div class="preloader__text preloader__text--fail">
@@ -280,7 +280,7 @@
         }
       </style>
       <main class="js-required-message">
-        <h1>JavaScript is required to run Grafana</h1>
+        <h1>JavaScript is required to run GF Insight</h1>
         <p>Please enable JavaScript in your browser and reload the page.</p>
       </main>
     </noscript>
