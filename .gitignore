@@ -19,6 +19,7 @@ tsconfig.tsbuildinfo
 .jest-canvas-mock-compare
 __debug_bin*
 *.cov
+.codegraph
 
 # yarn
 .yarn/cache
