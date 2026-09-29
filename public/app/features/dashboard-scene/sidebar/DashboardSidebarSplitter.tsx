@@ -56,11 +56,8 @@ function DashboardSidebarSplitterEmbedded({ dashboard, body, controls }: Props) 
 
   return (
     <div className={styles.container}>
-      <DashboardControlsChrome>{controls}</DashboardControlsChrome>
-      <div
-        className={cx(styles.bodyWrapper, styles.bodyWrapperKiosk)}
-        data-testid={selectors.components.DashboardSidebarSplitter.primaryBody}
-      >
+      {controls}
+      <div className={styles.embeddedBody} data-testid={selectors.components.DashboardSidebarSplitter.primaryBody}>
         <NativeScrollbar onSetScrollRef={dashboard.onSetScrollRef}>{body}</NativeScrollbar>
       </div>
     </div>
@@ -291,6 +288,14 @@ function getStyles(theme: GrafanaTheme2) {
     }),
     bodyWrapperKiosk: css({
       padding: theme.spacing(0, 2, 2, 2),
+    }),
+    embeddedBody: css({
+      display: 'flex',
+      flexDirection: 'column',
+      // Embedded dashboards scroll the document. Let the canvas grow with its panels
+      // so the bottom padding follows the content instead of sitting inside overflow.
+      flex: '1 0 auto',
+      padding: theme.spacing(0, 2, 3, 2),
     }),
     scrollContainer: css({
       display: 'flex',

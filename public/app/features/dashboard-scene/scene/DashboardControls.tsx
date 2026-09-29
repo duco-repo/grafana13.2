@@ -248,7 +248,11 @@ function DashboardControlsRenderer({ model }: SceneComponentProps<DashboardContr
   }
 
   return (
-    <div data-testid={selectors.pages.Dashboard.Controls} className={styles.controls}>
+    <div
+      data-testid={selectors.pages.Dashboard.Controls}
+      data-grafana-dashboard-controls={dashboardEmbed ? '' : undefined}
+      className={styles.controls}
+    >
       <div className={cx(styles.rightControls, editPanel && styles.rightControlsWrap)}>
         {!hideTimeControls && (
           <div className={styles.fixedControls}>
