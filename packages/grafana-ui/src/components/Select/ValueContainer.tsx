@@ -34,7 +34,7 @@ export const ValueContainer = <Option, IsMulti extends boolean, Group extends Gr
   }, [selectProps.value, selectProps.autoWidth, selectProps.maxVisibleValues]);
 
   const renderContainer = (containerChildren?: ReactNode) => {
-    const noWrap = selectProps?.noMultiValueWrap && !selectProps?.menuIsOpen;
+    const noWrap = selectProps.noMultiValueWrap && !(selectProps.showAllSelectedWhenOpen && selectProps.menuIsOpen);
     const dataTestid = selectProps['data-testid'];
     const className = cx(styles.valueContainer, {
       [styles.valueContainerMulti]: isMulti && !noWrap,
@@ -57,8 +57,17 @@ export const ValueContainer = <Option, IsMulti extends boolean, Group extends Gr
   ) {
     const [valueChildren, ...otherChildren] = children;
     const truncatedValues = valueChildren.slice(0, selectProps.maxVisibleValues);
+    const hiddenValuesCount = valueChildren.length - truncatedValues.length;
 
-    return renderContainer([truncatedValues, ...otherChildren]);
+    return renderContainer([
+      truncatedValues,
+      hiddenValuesCount > 0 && (
+        <span key="excess-values" className={cx(styles.multiValueContainer, styles.multiValueCount)}>
+          {`+${hiddenValuesCount}`}
+        </span>
+      ),
+      ...otherChildren,
+    ]);
   }
 
   return renderContainer(children);

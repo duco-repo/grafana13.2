@@ -1,0 +1,66 @@
+diff --git a/dist/esm/variables/components/VariableValueSelect.js b/dist/esm/variables/components/VariableValueSelect.js
+index f815b2e72fc9b5d92bfff013c1405cf0b8b37374..3163785ed93280a59285c131f86012fd3d8dc394 100644
+--- a/dist/esm/variables/components/VariableValueSelect.js
++++ b/dist/esm/variables/components/VariableValueSelect.js
+@@ -130,7 +130,7 @@ function VariableValueSelectMulti({
+       disabled: isReadOnly,
+       value: uncommittedValue,
+       noMultiValueWrap: true,
+-      maxVisibleValues: maxVisibleValues != null ? maxVisibleValues : 5,
++      maxVisibleValues: maxVisibleValues != null ? maxVisibleValues : 1,
+       tabSelectsValue: false,
+       virtualized: true,
+       allowCustomValue,
+diff --git a/dist/esm/variables/groupby/GroupByVariable.js b/dist/esm/variables/groupby/GroupByVariable.js
+index 2ab0b3228efd0397b14987454ca09fe2a916de01..894b82f902a771891f2acb958b6043f7bfba7c1d 100644
+--- a/dist/esm/variables/groupby/GroupByVariable.js
++++ b/dist/esm/variables/groupby/GroupByVariable.js
+@@ -331,7 +331,7 @@ function GroupByVariableRenderer({ model }) {
+       inputValue,
+       value: uncommittedValue,
+       noMultiValueWrap: true,
+-      maxVisibleValues: maxVisibleValues != null ? maxVisibleValues : 5,
++      maxVisibleValues: maxVisibleValues != null ? maxVisibleValues : 1,
+       tabSelectsValue: false,
+       virtualized: true,
+       options: filteredOptions,
+@@ -401,7 +401,7 @@ function GroupByVariableRenderer({ model }) {
+       value: uncommittedValue && uncommittedValue.length > 0 ? uncommittedValue : null,
+       allowCustomValue,
+       noMultiValueWrap: true,
+-      maxVisibleValues: maxVisibleValues != null ? maxVisibleValues : 5,
++      maxVisibleValues: maxVisibleValues != null ? maxVisibleValues : 1,
+       tabSelectsValue: false,
+       virtualized: true,
+       options: filteredOptions,
+diff --git a/dist/index.js b/dist/index.js
+index c714598d3195fdc66d3d6adb9531e78bd7a9b6ff..8fad88c143c28fe16aa8c6a9e6505273111dfee6 100644
+--- a/dist/index.js
++++ b/dist/index.js
+@@ -5820,7 +5820,7 @@ function VariableValueSelectMulti({
+       disabled: isReadOnly,
+       value: uncommittedValue,
+       noMultiValueWrap: true,
+-      maxVisibleValues: maxVisibleValues != null ? maxVisibleValues : 5,
++      maxVisibleValues: maxVisibleValues != null ? maxVisibleValues : 1,
+       tabSelectsValue: false,
+       virtualized: true,
+       allowCustomValue,
+@@ -10877,7 +10877,7 @@ function GroupByVariableRenderer({ model }) {
+       inputValue,
+       value: uncommittedValue,
+       noMultiValueWrap: true,
+-      maxVisibleValues: maxVisibleValues != null ? maxVisibleValues : 5,
++      maxVisibleValues: maxVisibleValues != null ? maxVisibleValues : 1,
+       tabSelectsValue: false,
+       virtualized: true,
+       options: filteredOptions,
+@@ -10947,7 +10947,7 @@ function GroupByVariableRenderer({ model }) {
+       value: uncommittedValue && uncommittedValue.length > 0 ? uncommittedValue : null,
+       allowCustomValue,
+       noMultiValueWrap: true,
+-      maxVisibleValues: maxVisibleValues != null ? maxVisibleValues : 5,
++      maxVisibleValues: maxVisibleValues != null ? maxVisibleValues : 1,
+       tabSelectsValue: false,
+       virtualized: true,
+       options: filteredOptions,

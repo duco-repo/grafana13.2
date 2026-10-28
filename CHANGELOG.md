@@ -1,3 +1,38 @@
+# 13.2.1-e.3 (2026-10-28)
+
+- Multi-select controls and dashboard variables show one selected value followed immediately
+  by a matching `+N` chip. Selected chips use 4px top and bottom padding.
+
+# 13.2.1-e.2 (2026-10-28)
+
+These changes retain the current distribution baseline and backport security fixes from
+[Grafana 13.2.3](https://github.com/grafana/grafana/releases/tag/v13.2.3),
+[13.2.4](https://github.com/grafana/grafana/releases/tag/v13.2.4), and
+[13.2.5](https://github.com/grafana/grafana/releases/tag/v13.2.5).
+
+### Security
+
+- Restrict alert-rule listing, dashboard provisioning provenance, and paused shared-dashboard tokens
+  (CVE-2026-13719, CVE-2026-13720, CVE-2026-81841).
+- Enforce Git Sync connection-status permissions and bound Git responses and Prometheus conversion
+  requests (CVE-2026-15577, CVE-2026-95502, CVE-2026-33374).
+- Restrict Azure Monitor proxy operations and credential-bearing correlation requests
+  (CVE-2026-93294, CVE-2026-88967).
+- Apply provider-scoped SSO settings authorization and secret redaction, reject newly introduced
+  unsupported receiver schemas, and limit expression nesting
+  (CVE-2026-100105, CVE-2026-103506, CVE-2026-88858).
+  SSO list responses redact copies so cached authentication secrets remain intact.
+- Update Go to 1.26.10, the Alpine base to 3.24.3, and the affected Go dependencies, including
+  nanogit response limits and Alerting OAuth redirect-header protection.
+
+### User interface and bug fixes
+
+- Multi-select controls show two selected values followed by `+N`, including while open.
+  Dashboard variables use the same default. Long labels truncate within the control; explicit
+  display-limit and show-all options remain supported.
+- Return query errors for unknown CloudWatch log-action subtypes and Azure Monitor metrics queries
+  missing their query configuration, instead of panicking.
+
 <!-- 13.2.0 START -->
 
 # 13.2.0 (2026-08-18)

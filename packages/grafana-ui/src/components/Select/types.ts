@@ -47,6 +47,7 @@ export interface SelectCommonProps<T> {
   formatCreateLabel?: (input: string) => React.ReactNode;
   getOptionLabel?: (item: SelectableValue<T>) => React.ReactNode;
   getOptionValue?: (item: SelectableValue<T>) => T | undefined;
+  /** Hide selected options in the menu. Defaults to false unless all selected values are shown when open. */
   hideSelectedOptions?: boolean;
   inputValue?: string;
   invalid?: boolean;
@@ -60,9 +61,11 @@ export interface SelectCommonProps<T> {
   isOpen?: boolean;
   /** Disables the possibility to type into the input*/
   isSearchable?: boolean;
+  /** Show every selected value while the menu is open. Defaults to false. */
   showAllSelectedWhenOpen?: boolean;
   maxMenuHeight?: number;
   minMenuHeight?: number;
+  /** Maximum number of selected values displayed before the overflow count. Defaults to 1. */
   maxVisibleValues?: number;
   menuPlacement?: 'auto' | 'bottom' | 'top';
   menuPosition?: 'fixed' | 'absolute';
@@ -115,7 +118,7 @@ export interface SelectCommonProps<T> {
   ) => boolean;
   /** Message to display isLoading=true*/
   loadingMessage?: string;
-  /** Disables wrapping of multi value values when closed */
+  /** Disables wrapping of selected values, except when showing all values in the open menu. */
   noMultiValueWrap?: boolean;
   /** Use a custom ref because generic component as output of React.forwardRef is not directly possible */
   selectRef?: React.Ref<HTMLElement>;

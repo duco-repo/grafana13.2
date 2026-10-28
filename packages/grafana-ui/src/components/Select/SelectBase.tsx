@@ -1,11 +1,6 @@
 import { type ComponentProps, useCallback, useEffect, useRef, useState, useImperativeHandle } from 'react';
 import * as React from 'react';
-import {
-  default as ReactSelect,
-  type IndicatorsContainerProps,
-  type Props as ReactSelectProps,
-  type ClearIndicatorProps,
-} from 'react-select';
+import { default as ReactSelect, type ClearIndicatorProps } from 'react-select';
 import { default as ReactAsyncSelect } from 'react-select/async';
 import { default as AsyncCreatable } from 'react-select/async-creatable';
 import Creatable from 'react-select/creatable';
@@ -73,12 +68,6 @@ const CustomControl = (props: any) => {
   );
 };
 
-interface SelectPropsWithExtras extends ReactSelectProps {
-  maxVisibleValues?: number | undefined;
-  showAllSelectedWhenOpen: boolean;
-  noMultiValueWrap?: boolean;
-}
-
 function determineToggleAllState(selectedValue: SelectableValue[], options: SelectableValue[]) {
   if (options.length === selectedValue.length) {
     return ToggleAllState.allSelected;
@@ -123,7 +112,7 @@ export function SelectBase<T, Rest = {}>({
   loadingMessage = 'Loading options...',
   maxMenuHeight = 300,
   minMenuHeight,
-  maxVisibleValues,
+  maxVisibleValues = 1,
   menuPlacement = 'auto',
   menuPosition = 'fixed',
   menuShouldPortal = true,
@@ -144,7 +133,7 @@ export function SelectBase<T, Rest = {}>({
   placeholder = t('grafana-ui.select.placeholder', 'Choose'),
   prefix,
   renderControl,
-  showAllSelectedWhenOpen = true,
+  showAllSelectedWhenOpen = false,
   tabSelectsValue = true,
   value,
   virtualized = false,
@@ -152,7 +141,7 @@ export function SelectBase<T, Rest = {}>({
   width,
   isValidNewOption,
   formatOptionLabel,
-  hideSelectedOptions,
+  hideSelectedOptions = isMulti && showAllSelectedWhenOpen,
   selectRef,
   ...rest
 }: SelectBaseProps<T> & Rest) {
@@ -376,7 +365,7 @@ export function SelectBase<T, Rest = {}>({
           Group: SelectOptionGroup,
           GroupHeading: SelectOptionGroupHeader,
           ValueContainer,
-          IndicatorsContainer: CustomIndicatorsContainer,
+          IndicatorsContainer,
           IndicatorSeparator: IndicatorSeparator,
           Control: CustomControl,
           Option: SelectMenuOptions,
@@ -465,36 +454,6 @@ function defaultFormatCreateLabel(input: string) {
       </div>
     </div>
   );
-}
-
-type CustomIndicatorsContainerProps = IndicatorsContainerProps & {
-  selectProps: SelectPropsWithExtras;
-  children: React.ReactNode;
-};
-
-function CustomIndicatorsContainer(props: CustomIndicatorsContainerProps) {
-  const { showAllSelectedWhenOpen, maxVisibleValues, menuIsOpen } = props.selectProps;
-
-  const value = props.getValue();
-
-  if (maxVisibleValues !== undefined && Array.isArray(props.children)) {
-    const selectedValuesCount = value.length;
-
-    if (selectedValuesCount > maxVisibleValues && !(showAllSelectedWhenOpen && menuIsOpen)) {
-      const indicatorChildren = [...props.children];
-      indicatorChildren.splice(
-        -1,
-        0,
-        <span key="excess-values" id="excess-values">
-          {`(+${selectedValuesCount - maxVisibleValues})`}
-        </span>
-      );
-
-      return <IndicatorsContainer {...props}>{indicatorChildren}</IndicatorsContainer>;
-    }
-  }
-
-  return <IndicatorsContainer {...props} />;
 }
 
 function IndicatorSeparator() {

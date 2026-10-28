@@ -108,6 +108,7 @@ export const getSelectStyles = stylesFactory((theme: GrafanaTheme2) => {
       position: 'relative',
       boxSizing: 'border-box',
       flex: '1 1 0%',
+      minWidth: 0,
       outline: 'none',
       overflow: 'hidden',
     }),
@@ -117,8 +118,8 @@ export const getSelectStyles = stylesFactory((theme: GrafanaTheme2) => {
       display: 'flex',
     }),
     valueContainerMultiNoWrap: css({
-      display: 'grid',
-      gridAutoFlow: 'column',
+      display: 'flex',
+      flexWrap: 'nowrap',
     }),
     loadingMessage: css({
       label: 'grafana-select-loading-message',
@@ -129,12 +130,14 @@ export const getSelectStyles = stylesFactory((theme: GrafanaTheme2) => {
     multiValueContainer: css({
       label: 'grafana-select-multi-value-container',
       display: 'flex',
+      minWidth: 0,
+      maxWidth: '100%',
       alignItems: 'center',
-      lineHeight: 1,
+      lineHeight: theme.spacing(1.75),
       background: theme.colors.background.secondary,
       borderRadius: theme.shape.radius.sm,
       margin: theme.spacing(0.25, 1, 0.25, 0),
-      padding: theme.spacing(0.25, 0, 0.25, 1),
+      padding: theme.spacing(0.5, 0, 0.5, 1),
       color: theme.colors.text.primary,
       fontSize: theme.typography.size.sm,
       overflow: 'hidden',
@@ -143,6 +146,10 @@ export const getSelectStyles = stylesFactory((theme: GrafanaTheme2) => {
       '&:hover': {
         background: theme.colors.emphasize(theme.colors.background.secondary),
       },
+    }),
+    multiValueCount: css({
+      paddingRight: theme.spacing(1),
+      flexShrink: 0,
     }),
     multiValueRemove: css({
       label: 'grafana-select-multi-value-remove',

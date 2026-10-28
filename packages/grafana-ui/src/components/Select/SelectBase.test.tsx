@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 import { select } from 'react-select-event';
@@ -9,6 +9,7 @@ import { selectors } from '@grafana/e2e-selectors';
 import { Drawer } from '../Drawer/Drawer';
 import { Modal } from '../Modal/Modal';
 
+import { MultiSelect } from './Select';
 import { SelectBase } from './SelectBase';
 
 // Used to select an option or options from a Select in unit tests
@@ -143,7 +144,7 @@ describe('SelectBase', () => {
           />
         );
         expect(screen.queryAllByText(/option/i).length).toBe(3);
-        expect(screen.queryByText(/\(\+2\)/i)).toBeVisible();
+        expect(screen.getByText('+2')).toBeVisible();
       });
 
       describe('and showAllSelectedWhenOpen prop is true', () => {
@@ -161,7 +162,7 @@ describe('SelectBase', () => {
           );
 
           expect(screen.queryAllByText(/option/i).length).toBe(5);
-          expect(screen.queryByText(/\(\+2\)/i)).not.toBeInTheDocument();
+          expect(screen.queryByText('+2')).not.toBeInTheDocument();
         });
       });
 
@@ -179,26 +180,91 @@ describe('SelectBase', () => {
             />
           );
 
-          expect(screen.queryAllByText(/option/i).length).toBe(3);
-          expect(screen.queryByText(/\(\+2\)/i)).toBeVisible();
+          expect(
+            within(screen.getByTestId(selectors.components.Select.container)).getAllByText(/option/i)
+          ).toHaveLength(3);
+          expect(screen.getByText('+2')).toBeVisible();
         });
       });
     });
 
     describe('is not provided', () => {
-      it('should always show all selected options', () => {
+      it.each([false, true])('shows one selected value and the overflow count when open=%s', (isOpen) => {
         render(
           <SelectBase
             onChange={onChangeHandler}
             isMulti={true}
             options={excessiveOptions}
             value={excessiveOptions}
-            isOpen={false}
+            isOpen={isOpen}
           />
         );
 
-        expect(screen.queryAllByText(/option/i).length).toBe(5);
-        expect(screen.queryByText(/\(\+2\)/i)).not.toBeInTheDocument();
+        expect(within(screen.getByTestId(selectors.components.Select.container)).getAllByText(/option/i)).toHaveLength(
+          1
+        );
+        const overflowCount = screen.getByText('+4');
+        const input = screen.getByRole('combobox');
+        expect(overflowCount).toBeVisible();
+        expect(overflowCount.previousElementSibling).toHaveTextContent('Option 1');
+        expect(overflowCount.nextElementSibling).toContainElement(input);
+      });
+
+      it.each([0, 1])('shows %s selected values without an overflow count', (count) => {
+        render(
+          <SelectBase
+            onChange={onChangeHandler}
+            isMulti
+            options={excessiveOptions}
+            value={excessiveOptions.slice(0, count)}
+          />
+        );
+
+        expect(screen.queryAllByText(/option/i)).toHaveLength(count);
+        expect(screen.queryByText(/^\+\d+$/)).not.toBeInTheDocument();
+      });
+
+      it('preserves hidden values when removing, searching, changing a menu option, and clearing', async () => {
+        const onChange = jest.fn();
+        const Test = () => {
+          const [value, setValue] = useState(excessiveOptions);
+          return (
+            <MultiSelect
+              isClearable
+              closeMenuOnSelect={false}
+              options={excessiveOptions}
+              value={value}
+              onChange={(nextValue, action) => {
+                onChange(nextValue, action);
+                setValue(nextValue);
+              }}
+            />
+          );
+        };
+        render(<Test />);
+
+        await userEvent.click(screen.getAllByLabelText('Remove')[0]);
+        expect(onChange).toHaveBeenLastCalledWith(excessiveOptions.slice(1), expect.anything());
+        expect(screen.getByText('+3')).toBeVisible();
+
+        const input = screen.getByRole('combobox');
+        await userEvent.click(input);
+        expect(screen.getAllByRole('option', { selected: true })).toHaveLength(4);
+        await userEvent.type(input, 'Option 5');
+        expect(screen.getAllByRole('option')).toHaveLength(1);
+        await userEvent.click(screen.getByRole('option', { name: 'Option 5', selected: true }));
+        expect(onChange).toHaveBeenLastCalledWith(excessiveOptions.slice(1, 4), expect.anything());
+
+        await userEvent.clear(input);
+        await userEvent.click(input);
+        await userEvent.click(screen.getByRole('option', { name: 'Option 1', selected: false }));
+        expect(onChange).toHaveBeenLastCalledWith(
+          [...excessiveOptions.slice(1, 4), excessiveOptions[0]],
+          expect.anything()
+        );
+
+        await userEvent.click(screen.getByRole('button', { name: 'Clear value' }));
+        expect(onChange).toHaveBeenLastCalledWith([], expect.anything());
       });
     });
   });
